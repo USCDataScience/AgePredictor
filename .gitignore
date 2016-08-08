@@ -14,6 +14,3 @@ hs_err_pid*
 *.DS_Store
 
 target/
-
-# Training data files
-data/*/*txt
