@@ -31,11 +31,11 @@ import opennlp.tools.util.TrainingParameters;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.PlainTextByLineStream;
 
-import gov.nasa.jpl.ml.authorage.AgeClassifyFactory;
-import gov.nasa.jpl.ml.authorage.AgeClassifyME;
-import gov.nasa.jpl.ml.authorage.AgeClassifyModel;
-import gov.nasa.jpl.ml.authorage.AuthorAgeSample;
-import gov.nasa.jpl.ml.authorage.AuthorAgeSampleStream;
+import opennlp.tools.authorage.AgeClassifyFactory;
+import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.authorage.AgeClassifyModel;
+import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.authorage.AuthorAgeSampleStream;
 
 //import opennlp.tools.ml.naivebayes.NaiveBayesTrainer;
 
@@ -46,15 +46,14 @@ public class AgeClassifyExample {
     
     AgeClassifyModel model;
     
-    private final String INPUT_PATH = 
-	"/Users/joeyhong/eclipse-workspace/AgePrediction/src/main/java/com/jpl/authorage/example/data/sample_age.txt";
-    private final String MODEL_PATH = 
-	"/Users/joeyhong/eclipse-workspace/AgePrediction/src/main/java/com/jpl/authorage/example/model/sample_age";
-    
+    private final String INPUT_PATH = "/Users/joeyhong/eclipse-workspace/AgePrediction/data/blogs/blogs-test.txt";
+    private final String MODEL_PATH = "/Users/joeyhong/eclipse-workspace/AgePrediction/model/blogs-test-model";
+
     public static void main( String[] args ) throws IOException
     {
         AgeClassifyExample myClassifier = new AgeClassifyExample();
 	myClassifier.train();
+	//myClassifier.saveModel();
 	myClassifier.classify("Hello World!");
     }
     
@@ -71,7 +70,7 @@ public class AgeClassifyExample {
 	    
 	    TrainingParameters params = new TrainingParameters();
 	    params.put(TrainingParameters.CUTOFF_PARAM, Integer.toString(0));
-	    params.put(TrainingParameters.ITERATIONS_PARAM, Integer.toString(30));
+	    params.put(TrainingParameters.ITERATIONS_PARAM, Integer.toString(100));
 	    //params.put(TrainingParameters.ALGORITHM_PARAM, NaiveBayesTrainer.NAIVE_BAYES_VALUE);
 	    
 	    AgeClassifyFactory factory = new AgeClassifyFactory();

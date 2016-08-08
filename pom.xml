@@ -77,20 +77,20 @@
 	</executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptorRefs>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-assembly-plugin</artifactId>
+	<version>2.3</version>
+	<configuration>  
+	  <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>com.jpl.cmdline.CLI</mainClass>
-            </manifest>
-          </archive>
-	  
-        </configuration>
-        <executions>
+	   <archive>
+             <manifest>
+               <mainClass>gov.nasa.jpl.ml.cmdline.CLI</mainClass>
+             </manifest>
+           </archive>
+	</configuration>
+	<executions>
           <execution>
             <id>make-assembly</id>
             <phase>package</phase>
@@ -99,6 +99,21 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-jar-plugin</artifactId>
+	<version>3.0.0</version>
+	<configuration>
+	  <excludes> 
+	    <exclude>**/log4j.properties</exclude>
+	  </excludes>
+	  <archive>
+	    <manifest>
+	      <mainClass>gov.nasa.jpl.ml.cmdline.CLI</mainClass>
+	    </manifest>
+	  </archive>
+	</configuration>
       </plugin>
     </plugins>
   </build>

@@ -47,7 +47,7 @@ public class DoccatClassifyExample
     {
         DoccatClassifyExample myClassifier = new DoccatClassifyExample();
 	myClassifier.train();
-	myClassifier.classify("Hello World!");
+	myClassifier.classify("");
     }
     
     public void train() {

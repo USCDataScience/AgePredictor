@@ -17,10 +17,135 @@
 
 package gov.nasa.jpl.ml.cmdline;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import opennlp.tools.cmdline.BasicCmdLineTool;
+import opennlp.tools.cmdline.CmdLineTool;
+import opennlp.tools.cmdline.TerminateToolException;
+import opennlp.tools.cmdline.TypedCmdLineTool;
+
+import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTrainerTool;
+import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTool;
+import opennlp.tools.formats.AuthorAgeSampleStreamFactory;
 
 /**
  * TODO: Documentation
  */
 public class CLI {
+    public static final String CMD = "authorage";
+    public static final String DEFAULT_FORMAT = "authorage";
+    
+    private static Map<String, CmdLineTool> toolLookupMap;
+    
+    static {
+	toolLookupMap = new LinkedHashMap<String, CmdLineTool>();
+       
+	List<CmdLineTool> tools = new LinkedList<CmdLineTool>();
+	tools.add(new AgeClassifyTrainerTool());
+	tools.add(new AgeClassifyTool());
+	
+	AuthorAgeSampleStreamFactory.registerFactory();
+	
+	for (CmdLineTool tool : tools) {
+	    toolLookupMap.put(tool.getName(), tool);
+	}
+	
+	toolLookupMap = Collections.unmodifiableMap(toolLookupMap);
+    }
+    
+    private static void usage() {
+	System.out.println("Usage: " + CMD + " TOOL");
+	System.out.println("where TOOL is one of:");
+
+	// distance of tool name from line start
+	int numberOfSpaces = -1;
+	for (String toolName : toolLookupMap.keySet()) {
+	    if (toolName.length() > numberOfSpaces) {
+		numberOfSpaces = toolName.length();
+	    }
+	}
+	numberOfSpaces = numberOfSpaces + 4;
+
+	for (CmdLineTool tool : toolLookupMap.values()) {
+	    System.out.print("  " + tool.getName());
+
+	    for (int i = 0; i < Math.abs(tool.getName().length() - numberOfSpaces); i++) {
+		System.out.print(" ");
+	    }
+
+	    System.out.println(tool.getShortDescription());
+	}
+    }
+    
+    public static Set<String> getToolNames() {
+	return toolLookupMap.keySet();
+    }
+    
+    public static void main(String[] args) {
+	if (args.length == 0) {
+	    usage();
+	    System.exit(0);
+	}
+	
+	String toolArguments[] = new String[args.length -1];
+	System.arraycopy(args, 1, toolArguments, 0, toolArguments.length);
+	
+	String toolName = args[0];
+	
+	String formatName = DEFAULT_FORMAT;
+	int idx = toolName.indexOf(".");
+	if (-1 < idx) {
+	    formatName = toolName.substring(idx + 1);
+	    toolName = toolName.substring(0, idx);
+	}
+	CmdLineTool tool = toolLookupMap.get(toolName);
+	
+	try {
+	    if (null == tool) {
+		throw new TerminateToolException(1, "Tool " + toolName + " is not found.");
+	    }
+
+	    if ((0 == toolArguments.length && tool.hasParams()) ||
+		0 < toolArguments.length && "help".equals(toolArguments[0])) {
+		if (tool instanceof TypedCmdLineTool) {
+		    System.out.println(((TypedCmdLineTool) tool).getHelp(formatName));
+		} else if (tool instanceof BasicCmdLineTool) {
+		    System.out.println(tool.getHelp());
+		}
+
+		System.exit(0);
+	    }
+
+	    if (tool instanceof TypedCmdLineTool) {
+		((TypedCmdLineTool) tool).run(formatName, toolArguments);
+	    } else if (tool instanceof BasicCmdLineTool) {
+		if (-1 == idx) {
+		    ((BasicCmdLineTool) tool).run(toolArguments);
+		} else {
+		    throw new TerminateToolException(1, "Tool " + toolName + " does not support formats.");
+		}
+	    } else {
+		throw new TerminateToolException(1, "Tool " + toolName + " is not supported.");
+	    }
+	}
+	catch (TerminateToolException e) {
+
+	    if (e.getMessage() != null) {
+		System.err.println(e.getMessage());
+	    }
+
+	    if (e.getCause() != null) {
+		System.err.println(e.getCause().getMessage());
+		e.getCause().printStackTrace(System.err);
+	    }
+
+	    System.exit(e.getCode());
+	}
+    }
 
 }

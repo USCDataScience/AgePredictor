@@ -28,15 +28,16 @@ import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.ext.ExtensionLoader;
 import opennlp.tools.util.model.ModelUtil;
 
-import gov.nasa.jpl.ml.authorage.AgeClassifyFactory;
-import gov.nasa.jpl.ml.authorage.AgeClassifyME;
-import gov.nasa.jpl.ml.authorage.AgeClassifyModel;
-import gov.nasa.jpl.ml.authorage.AuthorAgeSample;
-import gov.nasa.jpl.ml.authorage.AuthorAgeSampleStream;
+import opennlp.tools.authorage.AgeClassifyFactory;
+import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.authorage.AgeClassifyModel;
+import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.authorage.AuthorAgeSampleStream;
+
 import gov.nasa.jpl.ml.cmdline.ClassifyTrainingToolParams;
 
-import gov.nasa.jpl.ml.util.featuregen.FeatureGenerator;
-import gov.nasa.jpl.ml.util.featuregen.TokenFeatureGenerator;
+import opennlp.tools.util.featuregen.FeatureGenerator;
+import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
 
 /**
  * TODO: Documentation
@@ -44,13 +45,13 @@ import gov.nasa.jpl.ml.util.featuregen.TokenFeatureGenerator;
 public class AgeClassifyTrainerTool 
     extends AbstractTrainerTool<AuthorAgeSample, ClassifyTrainingToolParams> {
     
-    protected AgeClassifyTrainerTool() {
+    public AgeClassifyTrainerTool() {
 	super(AuthorAgeSample.class, ClassifyTrainingToolParams.class);
     }
      
     @Override
     public String getShortDescription() {
-	return "trainer for the learnable author age classifier";
+	return "trainer for the author age classifier";
     }
    
     @Override
@@ -99,7 +100,7 @@ public class AgeClassifyTrainerTool
 
     private static FeatureGenerator[] createFeatureGenerators(String featureGeneratorsNames) {
 	if(featureGeneratorsNames == null) {
-	    FeatureGenerator[] def = { new TokenFeatureGenerator()};
+	    FeatureGenerator[] def = { new BagOfWordsFeatureGenerator()};
 	    return def;
 	}
 	String[] classes = featureGeneratorsNames.split(",");
