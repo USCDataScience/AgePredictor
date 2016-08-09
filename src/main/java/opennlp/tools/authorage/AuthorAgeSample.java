@@ -30,6 +30,21 @@ public class AuthorAgeSample {
     
     private final List<String> text;    
     
+    public AuthorAgeSample(String category, String text[]) {
+	if (category == null) {
+	    throw new IllegalArgumentException("Age cannot be null");
+	}
+	if (text == null) {
+	    throw new IllegalArgumentException("Text cannot be null");
+	}
+	
+	this.ageCategory = category;
+	
+	this.text = Collections
+	    .unmodifiableList(new ArrayList<String>(Arrays.asList(text)));
+    }
+
+
     public AuthorAgeSample(Integer age, String text[]) {
 	if (age == null) {
 	    throw new IllegalArgumentException("Age cannot be null");
@@ -39,45 +54,23 @@ public class AuthorAgeSample {
 	}
 	
 	if (age < 18) {
-	    this.ageCategory = "<18";
-	}
-	else if (age >= 18 && age <= 27) {
-	    this.ageCategory = "18-27";
-	}
-	else if (age >= 28 && age <= 37) {
-	    this.ageCategory = "28-37";
-	}
-	else { // (age > 37)
-	    this.ageCategory = ">37";
-	}
-	
-	// Will use when more data from older age groups are obtained
-	/* 
-	if (age < 18) {
-	    ageCategory = "<18";
+	    ageCategory = "xx-18";
 	}
 	else if (age >= 18 && age <= 24) {
 	    ageCategory = "18-24";
 	}
-	else if (age >= 25 && age <= 30) {
-	    ageCategory = "25-30";
+	else if (age >= 25 && age <= 34) {
+	    ageCategory = "25-34";
 	}
-	else if (age >= 30 && age <= 37) {
-	    ageCategory = "30-37";
+	else if (age >= 35 && age <= 49) {
+	    ageCategory = "35-49";
 	}
-	else if (age >= 38 && age <= 45) {
-	    ageCategory = "38-45";
-	}
-	else if (age >= 45 && age <= 55) {
-	    ageCategory = "45-55";
-	}
-	else if (age >= 56 && age <= 65) {
-	    ageCategory = "56-65";
+	else if (age >= 50 && age <= 64) {
+	    ageCategory = "50-64";
 	}
 	else { // (age > 65)
-	    ageCategory = ">65";
+	    ageCategory = "65-xx";
 	}
-	*/
 	
 	this.text = Collections
 	    .unmodifiableList(new ArrayList<String>(Arrays.asList(text)));

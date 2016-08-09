@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.Field;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
@@ -31,6 +32,7 @@ import opennlp.tools.util.ext.ExtensionLoader;
 import opennlp.tools.util.featuregen.FeatureGenerator;
 import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
 import opennlp.tools.tokenize.StemmerTokenizer;
+
 
 /**
  * TODO: Documentation
@@ -90,8 +92,17 @@ public class AgeClassifyFactory extends BaseToolFactory {
 	FeatureGenerator[] features = new FeatureGenerator[classes.length];
 
 	for (int i = 0; i < classes.length; i++) {
+	    /*
+	    Class ext = Class.forName(classes[i]);
+	    Field instance = ext.getDeclaredField("INSTANCE");
+	    System.out.println(instance.toString());
+	    
+	    features[i] = (FeatureGenerator) instance.getDeclaringClass();
+	    */
+	    
 	    features[i] = ExtensionLoader.instantiateExtension(FeatureGenerator.class,
 	        classes[i]);
+	   
 	}
 	return features;
     }
@@ -124,7 +135,7 @@ public class AgeClassifyFactory extends BaseToolFactory {
 		String className = artifactProvider.getManifestProperty(TOKENIZER_NAME);
 		if (className != null) {
 		    this.tokenizer = ExtensionLoader.instantiateExtension(
-		        Tokenizer.class, className);
+		        Tokenizer.class , className);
 		}
 	    }
 	    if (this.tokenizer == null) { // could not load using artifact provider

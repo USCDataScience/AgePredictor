@@ -31,13 +31,14 @@ import opennlp.tools.cmdline.TypedCmdLineTool;
 
 import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTrainerTool;
 import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTool;
+import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyEvaluatorTool;
 import opennlp.tools.formats.AuthorAgeSampleStreamFactory;
 
 /**
  * TODO: Documentation
  */
 public class CLI {
-    public static final String CMD = "authorage";
+    public static final String CMD = "bin/authorage";
     public static final String DEFAULT_FORMAT = "authorage";
     
     private static Map<String, CmdLineTool> toolLookupMap;
@@ -48,6 +49,7 @@ public class CLI {
 	List<CmdLineTool> tools = new LinkedList<CmdLineTool>();
 	tools.add(new AgeClassifyTrainerTool());
 	tools.add(new AgeClassifyTool());
+	tools.add(new AgeClassifyEvaluatorTool());
 	
 	AuthorAgeSampleStreamFactory.registerFactory();
 	

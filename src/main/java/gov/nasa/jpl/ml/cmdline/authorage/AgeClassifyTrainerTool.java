@@ -34,7 +34,7 @@ import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.authorage.AuthorAgeSampleStream;
 
-import gov.nasa.jpl.ml.cmdline.ClassifyTrainingToolParams;
+import gov.nasa.jpl.ml.cmdline.params.ClassifyTrainingToolParams;
 
 import opennlp.tools.util.featuregen.FeatureGenerator;
 import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;

@@ -34,39 +34,41 @@ public class AuthorAgeSampleStream extends FilterObjectStream<String, AuthorAgeS
     public AuthorAgeSample read() throws IOException {
 	String sampleString = samples.read();
 	
-	if (sampleString != null) {
-
-	    // Whitespace tokenize entire string
-	    String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(sampleString);
-
-	    AuthorAgeSample sample;
+	while (sampleString == null || sampleString.isEmpty()) {
+	    samples.read();
+	}
+	
+	// Whitespace tokenize entire string
+	String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(sampleString);
+	
+	AuthorAgeSample sample;
+	
+	if (tokens.length > 1) {
+	    String docTokens[] = new String[tokens.length - 1];
+	    System.arraycopy(tokens, 1, docTokens, 0, tokens.length -1);
 	    
-	    if (tokens.length > 1) {
-		int age;
-		
-		try {
-		    age = Integer.valueOf(tokens[0]);
-		} catch (NumberFormatException e) {
-		    e.printStackTrace();
-		    return null;
-		}
-		
-		String docTokens[] = new String[tokens.length - 1];
-		System.arraycopy(tokens, 1, docTokens, 0, tokens.length -1);
-		
+	    // input can be both an age number or age category
+	    try {
+		int age = Integer.valueOf(tokens[0]);
 		sample = new AuthorAgeSample(age, docTokens);
+	    } catch (NumberFormatException e) {
+		// try category as a string
+		String category = tokens[0];
+		sample = new AuthorAgeSample(category, docTokens); 
+	    } catch (Exception e) {
+		e.printStackTrace();
+		return null;
 	    }
-	    else {
-		throw new IOException(
-		     "Empty lines, or lines with only a category string are not allowed!");
-	    }
-
-	    return sample;
+	    
 	}
 	else {
-	    return null;
+	    //System.out.println("Error with line: " + sampleString);
+    	    throw new IOException(
+	    	"Empty lines, or lines with only a category string are not allowed!");
 	}
+	
+	return sample;
     }
-
+    
 
 }

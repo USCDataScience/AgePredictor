@@ -29,12 +29,12 @@ import opennlp.tools.util.InvalidFormatException;
 public class BagOfWordsFeatureGenerator implements FeatureGenerator {
     
     public static final BagOfWordsFeatureGenerator INSTANCE = new BagOfWordsFeatureGenerator();
-    
+
     public BagOfWordsFeatureGenerator() {
     }
     
     @Override
-	public Collection<String> extractFeatures(String[] text) {
+    public Collection<String> extractFeatures(String[] text) {
 	
 	Collection<String> bagOfWords = new ArrayList<String>(text.length);
 
