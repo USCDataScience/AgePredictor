@@ -34,40 +34,39 @@ public class AuthorAgeSampleStream extends FilterObjectStream<String, AuthorAgeS
     public AuthorAgeSample read() throws IOException {
 	String sampleString = samples.read();
 	
-	while (sampleString == null || sampleString.isEmpty()) {
-	    samples.read();
-	}
-	
-	// Whitespace tokenize entire string
-	String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(sampleString);
-	
-	AuthorAgeSample sample;
-	
-	if (tokens.length > 1) {
-	    String docTokens[] = new String[tokens.length - 1];
-	    System.arraycopy(tokens, 1, docTokens, 0, tokens.length -1);
+	if (sampleString != null) {
+	    // Whitespace tokenize entire string
+	    String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(sampleString);
 	    
-	    // input can be both an age number or age category
-	    try {
-		int age = Integer.valueOf(tokens[0]);
-		sample = new AuthorAgeSample(age, docTokens);
-	    } catch (NumberFormatException e) {
-		// try category as a string
-		String category = tokens[0];
-		sample = new AuthorAgeSample(category, docTokens); 
-	    } catch (Exception e) {
-		e.printStackTrace();
-		return null;
+	    AuthorAgeSample sample;
+	    
+	    if (tokens.length > 1) {
+		String docTokens[] = new String[tokens.length - 1];
+		System.arraycopy(tokens, 1, docTokens, 0, tokens.length -1);
+		
+		// input can be both an age number or age category
+		try {
+		    int age = Integer.valueOf(tokens[0]);
+		    sample = new AuthorAgeSample(age, docTokens);
+		} catch (NumberFormatException e) {
+		    // try category as a string
+		    String category = tokens[0];
+		    sample = new AuthorAgeSample(category, docTokens); 
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    return null;
+		}
+		
 	    }
-	    
-	}
-	else {
-	    //System.out.println("Error with line: " + sampleString);
-    	    throw new IOException(
-	    	"Empty lines, or lines with only a category string are not allowed!");
-	}
+	    else {
+		throw new IOException(
+		    "Empty lines, or lines with only a category string are not allowed!");
+	    }
 	
-	return sample;
+	    return sample;
+	}
+
+	return null;
     }
     
 

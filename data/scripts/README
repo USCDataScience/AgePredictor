@@ -1,0 +1,9 @@
+Scripts:
+--------------------------------------------
+1) format.sh: Makes sure each line follows the correct training data format. Skips over lines that do not follow the format. 
+
+2) merge.sh: Merges all files in a directory and deduplicates lines.
+
+3) shuffle.sh: Shuffles the lines in a file in a random order.
+
+4) train_test_split.sh: Splits the data into two sets: 90% training, and 10% test.
