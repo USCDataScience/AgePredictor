@@ -1,3 +1,5 @@
 Models:
 ----------------------------------------
-1) blogs-unigram: Model trained on the Blog Corpus with unigrams as features.
+1)blogs-unigram: Model trained on the Blog Corpus with unigrams as features. Accuracy: ~50.1%
+
+2)blogs-bigrams: Model trained on the Blog Corpus with unigrams and bigrams as features. Accuracy: ~51.2%

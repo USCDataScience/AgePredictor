@@ -57,7 +57,7 @@ public class AgeClassifyTrainerTool
     @Override
     public void run(String format, String[] args) {
 	super.run(format, args);
-	
+
 	mlParams = CmdLineUtil.loadTrainingParameters(params.getParams(), false);
 	if (mlParams == null) {
 	    mlParams = ModelUtil.createDefaultTrainingParameters();
@@ -67,9 +67,11 @@ public class AgeClassifyTrainerTool
 	
 	CmdLineUtil.checkOutputFile("age classifier model", modelOutFile);
 	
+	System.out.println("Feature Generators: " + params.getFeatureGenerators());
 	FeatureGenerator[] featureGenerators = createFeatureGenerators(params
             .getFeatureGenerators());
-
+	
+	System.out.println("Tokenizer: " + params.getTokenizer());
 	Tokenizer tokenizer = createTokenizer(params.getTokenizer());
 	
 	AgeClassifyModel model;

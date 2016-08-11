@@ -40,5 +40,4 @@ public interface ClassifyTrainingToolParams extends TrainingToolParams {
     @OptionalParameter
     String getFactory();
 
-
 }

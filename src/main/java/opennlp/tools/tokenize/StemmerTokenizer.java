@@ -35,14 +35,10 @@ public class StemmerTokenizer implements Tokenizer{
 		    tokens.add(tok);
 		    inTok = false;
 		}
-		else {
-		    if (!inTok) {
-			inTok = true;
-		    }
-		}
 	    }
 	    else {
 		stemmer.add(s.charAt(i));
+		inTok = true;
 	    }  
 	}
 	if (inTok) {
@@ -54,38 +50,9 @@ public class StemmerTokenizer implements Tokenizer{
     }
     
 
-    /**
-     * Same as WhitespaceTokenizer
-     */
     public Span[] tokenizePos(String s) {
-	
-	int tokStart = -1;
-	List<Span>tokens = new ArrayList<Span>();
-	boolean inTok = false;
-	
-	//gather up potential tokens
-	int end = s.length();
-	for (int i = 0; i < end; i++) {
-	    if (StringUtil.isWhitespace(s.charAt(i))) {
-		if (inTok) {
-		    tokens.add(new Span(tokStart, i));
-		    inTok = false;
-		    tokStart = -1;
-		}
-	    }
-	    else {
-		if (!inTok) {
-		    tokStart = i;
-		    inTok = true;
-		}
-	    }
-	}
-
-	if (inTok) {
-	    tokens.add(new Span(tokStart, end));
-	}
-
-	return tokens.toArray(new Span[tokens.size()]);
+	// Not needed
+	return new Span[0];
     }
     
 }

@@ -20,3 +20,8 @@ data/*/*txt
 data/*/*/
 
 *~
+
+# OpenNLP Downloaded Models
+model/opennlp/
+
+*pyc

@@ -19,6 +19,8 @@ package opennlp.tools.authorage;
 import java.io.IOException;
 import java.util.Arrays;
 
+
+import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.FilterObjectStream;
 import opennlp.tools.util.ObjectStream;
@@ -27,42 +29,55 @@ import opennlp.tools.util.ObjectStream;
  * TODO: Documentation
  */ 
 public class AuthorAgeSampleStream extends FilterObjectStream<String, AuthorAgeSample> {
+    
+    private Tokenizer tokenizer;
+    
     public AuthorAgeSampleStream(ObjectStream<String> samples) {
 	super(samples);
+	this.tokenizer = WhitespaceTokenizer.INSTANCE;
+    }
+    
+    public AuthorAgeSampleStream(ObjectStream<String> samples, Tokenizer tokenizer) {
+	super(samples);
+	this.tokenizer = tokenizer;
     }
 
     public AuthorAgeSample read() throws IOException {
 	String sampleString = samples.read();
 	
-	if (sampleString != null) {
-	    // Whitespace tokenize entire string
-	    String tokens[] = WhitespaceTokenizer.INSTANCE.tokenize(sampleString);
+	while (sampleString != null) {
+	    String category = sampleString.split("\t", 2)[0];
+	    
+	    String text = sampleString.split("\t", 2)[1];
+	    String tokens[] = this.tokenizer.tokenize(text);
 	    
 	    AuthorAgeSample sample;
-	    
-	    if (tokens.length > 1) {
-		String docTokens[] = new String[tokens.length - 1];
-		System.arraycopy(tokens, 1, docTokens, 0, tokens.length -1);
-		
-		// input can be both an age number or age category
+	    if (tokens.length > 0) {
+		//input can be both an age number or age category
 		try {
-		    int age = Integer.valueOf(tokens[0]);
-		    sample = new AuthorAgeSample(age, docTokens);
+		    int age = Integer.valueOf(category);
+		    sample = new AuthorAgeSample(age, tokens);
 		} catch (NumberFormatException e) {
-		    // try category as a string
-		    String category = tokens[0];
-		    sample = new AuthorAgeSample(category, docTokens); 
+		    //try category as a string
+		    sample = new AuthorAgeSample(category, tokens); 
 		} catch (Exception e) {
 		    e.printStackTrace();
-		    return null;
+		    
+		    //try reading another sample
+		    sampleString = samples.read();
+		    continue;
 		}
-		
 	    }
 	    else {
-		throw new IOException(
-		    "Empty lines, or lines with only a category string are not allowed!");
+		//try reading another sample
+		sampleString = samples.read();
+		continue;
+		
+		//throw new IOException(
+		//    "Empty lines, or lines with only a category string are not allowed!");
+		
 	    }
-	
+	    //System.out.println(Arrays.toString(sample.getText()));
 	    return sample;
 	}
 
