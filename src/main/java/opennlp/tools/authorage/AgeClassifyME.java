@@ -29,13 +29,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import opennlp.tools.ml.EventTrainer;
-import opennlp.tools.ml.TrainerFactory;
-import opennlp.tools.ml.TrainerFactory.TrainerType;
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.util.TrainingParameters;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.tokenize.Tokenizer;
+
+import opennlp.tools.ml.AgeClassifyTrainerFactory;
+import opennlp.tools.ml.AgeClassifyTrainerFactory.TrainerType;
 
 /**
  * TODO: Documentation
@@ -131,13 +132,13 @@ public class AgeClassifyME {
 
 	MaxentModel ageModel = null;
 	
-	TrainerType trainerType = TrainerFactory
+	TrainerType trainerType = AgeClassifyTrainerFactory
 	    .getTrainerType(trainParams.getSettings());
 	
 	ObjectStream<Event> eventStream = new AgeClassifyEventStream(samples,
 	    factory.createContextGenerator());
 	
-	EventTrainer trainer = TrainerFactory
+	EventTrainer trainer = AgeClassifyTrainerFactory
 	    .getEventTrainer(trainParams.getSettings(), entries);
 	ageModel = trainer.train(eventStream);
 	

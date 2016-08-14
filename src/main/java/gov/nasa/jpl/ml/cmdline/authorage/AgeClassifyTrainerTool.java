@@ -19,6 +19,8 @@ package gov.nasa.jpl.ml.cmdline.authorage;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 import opennlp.tools.cmdline.AbstractTrainerTool;
 import opennlp.tools.cmdline.CmdLineUtil;
@@ -33,6 +35,9 @@ import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.authorage.AuthorAgeSampleStream;
+
+import opennlp.tools.ml.AgeClassifyTrainerFactory;
+import opennlp.tools.util.TrainingParameters;
 
 import gov.nasa.jpl.ml.cmdline.params.ClassifyTrainingToolParams;
 
@@ -57,12 +62,40 @@ public class AgeClassifyTrainerTool
     @Override
     public void run(String format, String[] args) {
 	super.run(format, args);
-
-	mlParams = CmdLineUtil.loadTrainingParameters(params.getParams(), false);
+	
+	TrainingParameters mlParams = null;
+	
+	// load training parameters
+	String paramFile = params.getParams();
+	if (paramFile != null) {
+	    CmdLineUtil.checkInputFile("Training Parameter", new File(paramFile));
+	    
+	    InputStream paramsIn = null;
+	    try {
+		paramsIn = new FileInputStream(new File(paramFile));
+		
+		mlParams = new TrainingParameters(paramsIn);
+	    } catch(IOException e) {
+		throw new TerminateToolException(-1, "Error during parameters loading: " + e.getMessage(), e);
+	    }
+	    finally {
+		try {
+		    if (paramsIn != null)
+			paramsIn.close();
+		} catch (IOException e) {
+		    //handle error?
+		}
+	    }
+	    
+	    if (!AgeClassifyTrainerFactory.isValid(mlParams.getSettings())) {
+		throw new TerminateToolException(1, "Training parameters file '" + paramFile + "' is invalid!");    
+	    }
+	}
 	if (mlParams == null) {
 	    mlParams = ModelUtil.createDefaultTrainingParameters();
 	}
 	
+	// load output model file
 	File modelOutFile = params.getModel();
 	
 	CmdLineUtil.checkOutputFile("age classifier model", modelOutFile);
@@ -93,12 +126,14 @@ public class AgeClassifyTrainerTool
 	CmdLineUtil.writeModel("age classifier", modelOutFile, model);
     }
     
+
     private static Tokenizer createTokenizer(String tokenizer) {
 	if(tokenizer != null) {
 	    return ExtensionLoader.instantiateExtension(Tokenizer.class, tokenizer);
 	}
 	return WhitespaceTokenizer.INSTANCE;
     }
+
 
     private static FeatureGenerator[] createFeatureGenerators(String featureGeneratorsNames) {
 	if(featureGeneratorsNames == null) {
