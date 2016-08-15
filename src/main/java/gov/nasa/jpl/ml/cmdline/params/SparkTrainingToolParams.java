@@ -17,8 +17,6 @@
 
 package gov.nasa.jpl.ml.cmdline.params;
 
-import java.io.File;
-
 import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 import opennlp.tools.cmdline.params.TrainingToolParams;
 import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
@@ -26,20 +24,17 @@ import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
 /**
  * TODO: Documentation
  */
-public interface ClassifyTrainingToolParams extends TrainingToolParams {
+public interface SparkTrainingToolParams extends TrainingToolParams {
     @ParameterDescription(valueName = "featuregens", 
         description = "Comma separated feature generator classes. Bag of words default.")
     @OptionalParameter
     String getFeatureGenerators();
-
+    
     @ParameterDescription(valueName = "tokenizer", 
         description = "Tokenizer implementation. WhitespaceTokenizer is used if not specified.")
     @OptionalParameter
     String getTokenizer();
 
-    @ParameterDescription(valueName = "factoryName", 
-        description = "A sub-class of DoccatFactory where to get implementation and resources.")
-    @OptionalParameter
-    String getFactory();
-    
+    @ParameterDescription(valueName = "sampleData", description = "data to be used, usually a file name.")
+    String getData();
 }

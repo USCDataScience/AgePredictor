@@ -17,4 +17,16 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
-mvn -e -q exec:java "-Dexec.args=-Xmx6g" "-Dexec.mainClass=gov.nasa.jpl.ml.cmdline.CLI" "-Dexec.args=$*"
+export SPARK_HOME="/Users/joeyhong/spark-2.0.0-bin-hadoop2.7"
+
+# Created JAR Application
+export JAR="target/age-predictor-1.0-SNAPSHOT-jar-with-dependencies.jar"
+
+COMMAND=$1
+
+if [[ $COMMAND =~ *Spark* ]]; then
+    $SPARK_HOME/bin/spark-submit --master local[8] --conf spark.driver.maxResultSize=4g --conf spark.driver.memory=8g \
+	--conf spark.executor.memory=4g $JAR "$@"
+else
+    java -jar -Xmx8g $JAR $@
+fi

@@ -17,6 +17,8 @@
 
 package opennlp.tools.authorage;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +27,7 @@ import java.util.List;
 /**
  * TODO: Documentation
  */
-public class AuthorAgeSample {
+public class AuthorAgeSample implements Serializable{
     private final String ageCategory;
     
     private final List<String> text;    

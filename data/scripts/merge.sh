@@ -26,5 +26,5 @@ do
     cat $f >> intermediate.txt;
 done
 
-sort intermediate | uniq > $OUTPUT
+sort intermediate.txt | uniq >> $OUTPUT
 rm intermediate.txt

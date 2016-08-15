@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import opennlp.tools.ml.maxent.AgeClassifyGIS;
+import opennlp.tools.ml.maxent.GIS;
 
 import opennlp.tools.util.ext.ExtensionLoader;
 import opennlp.tools.util.ext.ExtensionNotLoadedException;
@@ -40,7 +41,8 @@ public class AgeClassifyTrainerFactory {
     static {
 	Map<String, Class> _trainers = new HashMap<String, Class>();
 	_trainers.put(AgeClassifyGIS.MAXENT_VALUE, AgeClassifyGIS.class);
-    
+	_trainers.put(GIS.MAXENT_VALUE, GIS.class);
+		      
 	BUILTIN_TRAINERS = Collections.unmodifiableMap(_trainers);
     }
     

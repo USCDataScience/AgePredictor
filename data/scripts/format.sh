@@ -23,5 +23,5 @@ OUTPUT=$2
 # Makes sure all the lines are in the correct format. Skips lines that
 # are not.
 
-grep -e '^[0-9]\{2\}\t.\{10,\}' $INPUT > $OUTPUT
-grep -e '^[0-9x-]\{5\}\t.\{10,\}' $INPUT >> $OUTPUT
+grep -e '^[0-9]\{2\}$(printf '\t').\{1,\}' $INPUT > $OUTPUT
+grep -e '^[0-9x-]\{5\}$(printf '\t').\{1,\}' $INPUT >> $OUTPUT

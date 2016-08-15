@@ -31,6 +31,9 @@ import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.PerformanceMonitor;
 import opennlp.tools.cmdline.TerminateToolException;
+import opennlp.tools.cmdline.ArgumentParser;
+import opennlp.tools.cmdline.ObjectStreamFactory;
+import opennlp.tools.cmdline.StreamFactoryRegistry;
 import opennlp.tools.cmdline.params.EvaluatorParams;
 import opennlp.tools.authorage.AgeClassifyEvaluationMonitor;
 import opennlp.tools.authorage.AgeClassifyModel;
@@ -39,6 +42,8 @@ import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.eval.EvaluationMonitor;
+
+import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation
@@ -49,9 +54,27 @@ public final class AgeClassifyEvaluatorTool extends
     public AgeClassifyEvaluatorTool() {
 	super(AuthorAgeSample.class, EvaluatorParams.class);
     }
-
+    
+    @Override
     public String getShortDescription() {
 	return "measures the performance of the AgeClassify model with the reference data";
+    }
+    
+        @Override
+    @SuppressWarnings({"unchecked"})
+    public String getHelp(String format) {
+	if ("".equals(format) || StreamFactoryRegistry.DEFAULT_FORMAT.equals(format)) {
+	    return getBasicHelp(paramsClass,
+				StreamFactoryRegistry.getFactory(type, StreamFactoryRegistry.DEFAULT_FORMAT)
+				.<EvaluatorParams>getParameters());
+	} else {
+	    ObjectStreamFactory<AuthorAgeSample> factory = StreamFactoryRegistry.getFactory(type, format);
+	    if (null == factory) {
+		throw new TerminateToolException(1, "Format " + format + " is not found.\n" + getHelp());
+	    }
+	    return "Usage: " + CLI.CMD + " " + getName() + " " +
+		ArgumentParser.createUsage(paramsClass, factory.<EvaluatorParams>getParameters());
+	}
     }
 
     public void run(String format, String[] args) {

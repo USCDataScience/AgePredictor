@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package opennlp.tools.authorage;
+package gov.nasa.jpl.ml.spark.authorage;;
 
 import java.util.Iterator;
 import java.util.Arrays;
@@ -24,16 +24,15 @@ import opennlp.tools.ml.model.Event;
 import opennlp.tools.util.AbstractEventStream;
 import opennlp.tools.util.ObjectStream;
 
+import opennlp.tools.authorage.AuthorAgeSample;
+
 /**
  * TODO: Documentation
  */
 public class AgeClassifyEventStream extends AbstractEventStream<AuthorAgeSample> {
-    private AgeClassifyContextGenerator contextGenerator;
     
-    AgeClassifyEventStream(ObjectStream<AuthorAgeSample> samples, 
-			   AgeClassifyContextGenerator createContextGenerator) {
+    public AgeClassifyEventStream(ObjectStream<AuthorAgeSample> samples) {
 	super(samples);
-	contextGenerator = createContextGenerator;
     }
     
     @Override
@@ -53,7 +52,7 @@ public class AgeClassifyEventStream extends AbstractEventStream<AuthorAgeSample>
 		
 		//System.out.println(Arrays.toString(sample.getText()));
 		return new Event(sample.getCategory(),
-				 contextGenerator.getContext(sample.getText()));
+				 sample.getText());
 	    }
 
 	    public void remove() {

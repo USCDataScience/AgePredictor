@@ -32,6 +32,7 @@ import opennlp.tools.cmdline.TypedCmdLineTool;
 import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTrainerTool;
 import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTool;
 import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyEvaluatorTool;
+import gov.nasa.jpl.ml.cmdline.spark.authorage.AgeClassifySparkTrainerTool;
 import opennlp.tools.formats.AuthorAgeSampleStreamFactory;
 
 /**
@@ -50,6 +51,7 @@ public class CLI {
 	tools.add(new AgeClassifyTrainerTool());
 	tools.add(new AgeClassifyTool());
 	tools.add(new AgeClassifyEvaluatorTool());
+	tools.add(new AgeClassifySparkTrainerTool());
 	
 	AuthorAgeSampleStreamFactory.registerFactory();
 	
