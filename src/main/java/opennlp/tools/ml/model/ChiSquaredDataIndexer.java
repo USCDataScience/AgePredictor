@@ -202,8 +202,8 @@ public class ChiSquaredDataIndexer extends AbstractDataIndexer {
 	while (pi.hasNext()) {
 	    String predicate = pi.next();
 	    
-	    // TODO: Allow adjustable confidence in predicate relevance (Default 99%)
-	    if (chisquare(predicate, stats) > 6.63) {
+	    // TODO: Allow adjustable confidence in predicate relevance (Default 90%)
+	    if (chisquare(predicate, stats) > 2.71) {
 		predCounts[index] = counter.get(predicate);
 		predicatesInOut.put(predicate, index);
 		index++;

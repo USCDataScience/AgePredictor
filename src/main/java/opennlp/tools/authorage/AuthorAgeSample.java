@@ -85,5 +85,24 @@ public class AuthorAgeSample implements Serializable{
     public String[] getText() {
 	return this.text.toArray(new String[this.text.size()]);
     }
+
+    @Override
+    public String toString() {
+	StringBuilder sampleString = new StringBuilder();
+
+	sampleString.append(ageCategory).append('\t');
+
+	for (String s : text) {
+	    sampleString.append(s).append(' ');
+	}
+
+	if (sampleString.length() > 0) {
+	    // remove last space
+	    sampleString.setLength(sampleString.length() - 1);
+	}
+
+	return sampleString.toString();
+    }
+    
     
 }

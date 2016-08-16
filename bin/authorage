@@ -23,10 +23,10 @@ export SPARK_HOME="/Users/joeyhong/spark-2.0.0-bin-hadoop2.7"
 export JAR="target/age-predictor-1.0-SNAPSHOT-jar-with-dependencies.jar"
 
 COMMAND=$1
-
-if [[ $COMMAND =~ *Spark* ]]; then
-    $SPARK_HOME/bin/spark-submit --master local[8] --conf spark.driver.maxResultSize=4g --conf spark.driver.memory=8g \
-	--conf spark.executor.memory=4g $JAR "$@"
+if [[ $COMMAND == *"Spark"* ]]; then
+    echo "Spark"
+    $SPARK_HOME/bin/spark-submit --verbose --master local[8] --driver-memory 8g --executor-memory 4g --num-executors 80 \
+	--conf "-XX:G1GC" $JAR "$@"
 else
     java -jar -Xmx8g $JAR $@
 fi

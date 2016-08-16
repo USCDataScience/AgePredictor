@@ -34,7 +34,8 @@ import opennlp.tools.cmdline.TerminateToolException;
 import opennlp.tools.cmdline.ArgumentParser;
 import opennlp.tools.cmdline.ObjectStreamFactory;
 import opennlp.tools.cmdline.StreamFactoryRegistry;
-import opennlp.tools.cmdline.params.EvaluatorParams;
+import opennlp.tools.cmdline.doccat.DoccatFineGrainedReportListener;
+
 import opennlp.tools.authorage.AgeClassifyEvaluationMonitor;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AgeClassifyEvaluator;
@@ -43,16 +44,17 @@ import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.eval.EvaluationMonitor;
 
+import gov.nasa.jpl.ml.cmdline.params.EvalToolParams;
 import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation
  */
 public final class AgeClassifyEvaluatorTool extends
-    AbstractEvaluatorTool<AuthorAgeSample, EvaluatorParams> {
-    
+    AbstractEvaluatorTool<AuthorAgeSample, EvalToolParams> {
+        
     public AgeClassifyEvaluatorTool() {
-	super(AuthorAgeSample.class, EvaluatorParams.class);
+	super(AuthorAgeSample.class, EvalToolParams.class);
     }
     
     @Override
@@ -60,20 +62,20 @@ public final class AgeClassifyEvaluatorTool extends
 	return "measures the performance of the AgeClassify model with the reference data";
     }
     
-        @Override
+    @Override
     @SuppressWarnings({"unchecked"})
     public String getHelp(String format) {
 	if ("".equals(format) || StreamFactoryRegistry.DEFAULT_FORMAT.equals(format)) {
 	    return getBasicHelp(paramsClass,
 				StreamFactoryRegistry.getFactory(type, StreamFactoryRegistry.DEFAULT_FORMAT)
-				.<EvaluatorParams>getParameters());
+				.<EvalToolParams>getParameters());
 	} else {
 	    ObjectStreamFactory<AuthorAgeSample> factory = StreamFactoryRegistry.getFactory(type, format);
 	    if (null == factory) {
 		throw new TerminateToolException(1, "Format " + format + " is not found.\n" + getHelp());
 	    }
 	    return "Usage: " + CLI.CMD + " " + getName() + " " +
-		ArgumentParser.createUsage(paramsClass, factory.<EvaluatorParams>getParameters());
+		ArgumentParser.createUsage(paramsClass, factory.<EvalToolParams>getParameters());
 	}
     }
 
@@ -92,6 +94,25 @@ public final class AgeClassifyEvaluatorTool extends
 	if (params.getMisclassified()) {
 	    listeners.add(new AgeClassifyEvaluationErrorListener());
 	}
+	
+	/* TODO: Add support for generatinr a detailed statistics report
+
+	DoccatFineGrainedReportListener reportListener = null;
+	File reportFile = params.getReportOutputFile();
+	OutputStream reportOutputStream = null;
+	if (reportFile != null) {
+	    CmdLineUtil.checkOutputFile("Report Output File", reportFile);
+	    try {
+		reportOutputStream = new FileOutputStream(reportFile);
+		reportListener = new DoccatFineGrainedReportListener(reportOutputStream);
+		listeners.add(reportListener);
+	    } catch (FileNotFoundException e) {
+		throw new TerminateToolException(-1,
+            "IO error while creating Doccat fine-grained report file: "
+						 + e.getMessage());
+	    }
+	}
+	*/
 	
 	AgeClassifyEvaluator evaluator = new AgeClassifyEvaluator(
 	    new AgeClassifyME(model),
@@ -136,6 +157,21 @@ public final class AgeClassifyEvaluatorTool extends
 	System.out.println();
 
 	System.out.println(evaluator);
+	
+	/*
+	if (reportListener != null) {
+	    System.out.println("Writing fine-grained report to "
+			       + params.getReportOutputFile().getAbsolutePath());
+	    reportListener.writeReport();
+
+	    try {
+		// TODO: is it a problem to close the stream now?
+		reportOutputStream.close();
+	    } catch (IOException e) {
+		// nothing to do
+	    }
+	}
+	*/
     }
     
 }

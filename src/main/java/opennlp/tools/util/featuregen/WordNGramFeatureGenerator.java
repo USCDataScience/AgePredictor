@@ -69,15 +69,15 @@ public class WordNGramFeatureGenerator implements FeatureGenerator {
      * @param extraInfo optional extra information
      * @return a collection of n gram features
      */
+    @Override
     public Collection<String> extractFeatures(String[] text) {
-
 	List<String> features = new ArrayList<String>();
 
 	for (int i = 0; i <= text.length - minGram; i++) {
 	    String feature = "ng=" + text[i];
 	    for (int y = 1; y < maxGram && i + y < text.length; y++) {
 		feature = feature + ":" + text[i + y];
-		int gramCount = y + 2;
+		int gramCount = y + 1;
 		if (maxGram >= gramCount && gramCount >= minGram) {
 		    features.add(feature);
 		}

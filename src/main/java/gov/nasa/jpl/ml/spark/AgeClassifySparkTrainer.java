@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 import opennlp.tools.ml.EventTrainer;
 import opennlp.tools.ml.model.Event;
@@ -50,6 +51,32 @@ import org.apache.spark.api.java.function.Function;
  * TODO: Documentation
  */
 public class AgeClassifySparkTrainer {
+
+    public static ObjectStream<AuthorAgeSample> createObjectStream(final JavaRDD<AuthorAgeSample> samples) {
+	
+	return new ObjectStream<AuthorAgeSample>() {
+	    private Iterator<AuthorAgeSample> iterator = samples.toLocalIterator();
+	    
+	    public AuthorAgeSample read() throws IOException {
+		if (iterator.hasNext()) {
+		    return iterator.next();
+		}
+		else {
+		    return null;
+		}
+	    }
+	        
+	    public void reset() throws IOException {
+		iterator = samples.toLocalIterator();
+	    }
+	        
+	    public void close() {
+	    }
+	        
+	};
+	
+    }
+
     
     public static AgeClassifyModel createModel(String languageCode, String dataIn,
 					       AgeClassifyContextGeneratorWrapper wrapper,
@@ -58,14 +85,14 @@ public class AgeClassifySparkTrainer {
 	SparkConf conf = new SparkConf().setAppName("AgeClassifySparkTrainer");
 	JavaSparkContext sc = new JavaSparkContext(conf);
 	
-	JavaRDD<String> data = sc.textFile(dataIn);
-	JavaRDD<AuthorAgeSample> samples = data.map(new CreateAuthorAgeSamples(wrapper));
-	//filter out error samples
-	JavaRDD<AuthorAgeSample> validSamples = samples.filter(new Function<AuthorAgeSample, Boolean>() {
+	JavaRDD<String> data = sc.textFile(dataIn).cache();
+	JavaRDD<AuthorAgeSample> samples = data.map(new CreateAuthorAgeSamples(wrapper)).filter(
+            new Function<AuthorAgeSample, Boolean>() {
+		@Override
 		public Boolean call(AuthorAgeSample s) { return s != null; }
-	    });
+	    }).cache();
 	
-	ObjectStream<AuthorAgeSample> sampleStream = ObjectStreamUtil.createObjectStream(validSamples.collect());
+	ObjectStream<AuthorAgeSample> sampleStream = createObjectStream(samples);
 	ObjectStream<Event> eventStream = new AgeClassifyEventStream(sampleStream);
 	
 	Map<String, String> entries = new HashMap<String, String>();
@@ -79,7 +106,7 @@ public class AgeClassifySparkTrainer {
 	
 	Map<String, String> manifestInfoEntries = new HashMap<String, String>();
 	return new AgeClassifyModel(languageCode, ageModel, manifestInfoEntries,
-	    new AgeClassifyFactory(wrapper.getTokenizer(), wrapper.getFeatureGenerators()));
+	       new AgeClassifyFactory(wrapper.getTokenizer(), wrapper.getFeatureGenerators()));
     }
     
     public static void main(String[] args) {
