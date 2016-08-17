@@ -46,6 +46,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.storage.StorageLevel;
 
 /**
  * TODO: Documentation
@@ -57,7 +58,7 @@ public class AgeClassifySparkTrainer {
 	return new ObjectStream<AuthorAgeSample>() {
 	    private Iterator<AuthorAgeSample> iterator = samples.toLocalIterator();
 	    
-	    public AuthorAgeSample read() throws IOException {
+	    public AuthorAgeSample read() {
 		if (iterator.hasNext()) {
 		    return iterator.next();
 		}
@@ -66,14 +67,14 @@ public class AgeClassifySparkTrainer {
 		}
 	    }
 	        
-	    public void reset() throws IOException {
+	    public void reset() {
 		iterator = samples.toLocalIterator();
 	    }
 	        
 	    public void close() {
 	    }
 	        
-	};
+	};    
 	
     }
 
@@ -85,7 +86,7 @@ public class AgeClassifySparkTrainer {
 	SparkConf conf = new SparkConf().setAppName("AgeClassifySparkTrainer");
 	JavaSparkContext sc = new JavaSparkContext(conf);
 	
-	JavaRDD<String> data = sc.textFile(dataIn).cache();
+	JavaRDD<String> data = sc.textFile(dataIn, 8).cache();
 	JavaRDD<AuthorAgeSample> samples = data.map(new CreateAuthorAgeSamples(wrapper)).filter(
             new Function<AuthorAgeSample, Boolean>() {
 		@Override
@@ -102,11 +103,14 @@ public class AgeClassifySparkTrainer {
             .getEventTrainer(trainParams.getSettings(), entries);
         MaxentModel ageModel = trainer.train(eventStream);
 	
+	data.unpersist();
+	samples.unpersist();
+
 	sc.stop();
 	
 	Map<String, String> manifestInfoEntries = new HashMap<String, String>();
 	return new AgeClassifyModel(languageCode, ageModel, manifestInfoEntries,
-	       new AgeClassifyFactory(wrapper.getTokenizer(), wrapper.getFeatureGenerators()));
+				    new AgeClassifyFactory(wrapper.getTokenizer(), wrapper.getFeatureGenerators()));
     }
     
     public static void main(String[] args) {
@@ -124,7 +128,7 @@ public class AgeClassifySparkTrainer {
 	//params.put(TrainingParameters.ALGORITHM_PARAM, NaiveBayesTrainer.NAIVE_BAYES_VALUE);
 	
 	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper("opennlp.tools.tokenize.SentenceTokenizer",
-											    "opennlp.tools.tokenize.BagOfWordsTokenizer");
+	    "opennlp.tools.tokenize.BagOfWordsTokenizer");
 	
 	AgeClassifyModel model;
 	try {

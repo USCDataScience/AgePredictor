@@ -17,16 +17,18 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
-export SPARK_HOME="/Users/joeyhong/spark-2.0.0-bin-hadoop2.7"
+export SPARK_HOME="spark-2.0.0-bin-hadoop2.7"
 
 # Created JAR Application
 export JAR="target/age-predictor-1.0-SNAPSHOT-jar-with-dependencies.jar"
 
 COMMAND=$1
 if [[ $COMMAND == *"Spark"* ]]; then
-    echo "Spark"
-    $SPARK_HOME/bin/spark-submit --verbose --master local[8] --driver-memory 8g --executor-memory 4g --num-executors 80 \
-	--conf "-XX:G1GC" $JAR "$@"
+    $SPARK_HOME/bin/spark-submit --verbose --master local[8]\
+	--driver-memory 16g --conf spark.driver.maxResultSize=12g \
+	--executor-memory 12g --conf spark.storage.memoryFraction=0.8 \
+	--conf spark.ui.port=9776\
+        $JAR "$@"
 else
     java -jar -Xmx8g $JAR $@
 fi

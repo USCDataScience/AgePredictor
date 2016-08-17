@@ -25,3 +25,6 @@ data/*/*/
 model/opennlp/*bin
 
 *pyc
+
+# Log files
+*out

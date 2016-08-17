@@ -51,10 +51,12 @@ public class AgeClassifySparkEvaluator {
 	    this.wrapper = w;
 	}
 	
+	@Override
 	public Boolean call(Tuple2<String, String> sample) throws IOException {
 	    String category = sample._1();
 	    String text = sample._2();
-	
+	    System.out.println("Sample: " + category + ", " + text);
+
 	    AgeClassifyME classifier = this.wrapper.getClassifier();
 	    
 	    String predicted = classifier.predict(text);
@@ -66,7 +68,7 @@ public class AgeClassifySparkEvaluator {
 	SparkConf conf = new SparkConf().setAppName("AgeClassifySparkEvaluator");
 	JavaSparkContext sc = new JavaSparkContext(conf);
 	
-	JavaRDD<String> data = sc.textFile(dataIn);
+	JavaRDD<String> data = sc.textFile(dataIn,8).cache();
 	
 	JavaPairRDD<String, String> samples = data.mapToPair(
 	    new PairFunction<String, String, String>() {
@@ -82,51 +84,68 @@ public class AgeClassifySparkEvaluator {
 			return null;
 		    }
 		}
-	    }).filter(
+	    }).cache();
+	
+	JavaPairRDD<String, String> validSamples = samples.filter(
 		      new Function<Tuple2<String, String>, Boolean>() {
 			  @Override
 			  public Boolean call(Tuple2<String, String> t) {
 			      return (t != null);
 			  }
-		      });
+		      }).cache();
+	samples.unpersist();
 	    
-	JavaPairRDD<String, String> correct = samples.filter(new EvaluateSample(model));
+	JavaPairRDD<String, String> correct = validSamples.filter(new EvaluateSample(model)).cache();
 	
-	System.out.println("Accuracy: " + (double) samples.count() / correct.count());
-	System.out.println("Number of Documents: " + samples.count());
+	long total = validSamples.count();
+	long good = correct.count();
+	if (total > 0) {   
+	    System.out.println("Accuracy: " +  (double) good / (double) total);
+	    System.out.println("Number of Documents: " + total);
+	}
 	
+	JavaPairRDD<String, Integer> totalMap = validSamples.aggregateByKey(0,
+	    new Function2<Integer, String, Integer>() {
+		@Override
+		public Integer call(Integer i, String s) {
+		    return i + 1;
+		}
+	    },
+            new Function2<Integer, Integer, Integer>() {
+      	        @Override
+		public Integer call(Integer i1, Integer i2) {
+		    return i1 + i2;
+		}
+	    }).cache();
+	
+	validSamples.unpersist();
+	
+	List<Tuple2<String, Integer>> totalCount = totalMap.collect();
+	
+	JavaPairRDD<String, Integer> correctMap = correct.aggregateByKey(0,
+	    new Function2<Integer, String, Integer>() {
+		@Override
+		public Integer call(Integer i, String s) {
+		    return i + 1;
+		}
+	    },
+            new Function2<Integer, Integer, Integer>() {
+      	        @Override
+		public Integer call(Integer i1, Integer i2) {
+		    return i1 + i2;
+		}
+	    }).cache();
+	
+	correct.unpersist();
 
-	List<Tuple2<String, Integer>> totalCount = samples.aggregateByKey(0,
-	    new Function2<Integer, String, Integer>() {
-		@Override
-		public Integer call(Integer i, String s) {
-		    return i + 1;
-		}
-	    },
-            new Function2<Integer, Integer, Integer>() {
-      	        @Override
-		public Integer call(Integer i1, Integer i2) {
-		    return i1 + i2;
-		}
-	    }).collect();
+	List<Tuple2<String, Integer>> correctCount = correctMap.collect();
 	
-	List<Tuple2<String, Integer>> correctCount = correct.aggregateByKey(0,
-	    new Function2<Integer, String, Integer>() {
-		@Override
-		public Integer call(Integer i, String s) {
-		    return i + 1;
-		}
-	    },
-            new Function2<Integer, Integer, Integer>() {
-      	        @Override
-		public Integer call(Integer i1, Integer i2) {
-		    return i1 + i2;
-		}
-	    }).collect();
 	
 	for (int i = 0; i < totalCount.size(); i++) {
-	    System.out.println(totalCount.get(i)._1() + ": " + totalCount.get(i)._2() + " documents");
-	    System.out.println("Accuracy: " + (double) correctCount.get(i)._2() / totalCount.get(i)._2());
+	    if (totalCount.get(i)._2() > 0) {
+		System.out.println(totalCount.get(i)._1() + ": " + totalCount.get(i)._2() + " documents");
+		System.out.println("Accuracy: " + (double) correctCount.get(i)._2() / totalCount.get(i)._2());
+	    }
 	}
 	
 	sc.stop();

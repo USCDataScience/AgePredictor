@@ -64,7 +64,7 @@ public class CreateAuthorAgeSamples implements Function<String, AuthorAgeSample>
 	}
 	
 	String features[] = context.toArray(new String[context.size()]); 
-	//System.out.println("AuthorAgeSample: " + Arrays.toString(features));
+	System.out.println("AuthorAgeSample: " + Arrays.toString(features));
 	
 	if (features.length > 0) {
 	    //input can be both an age number or age category
