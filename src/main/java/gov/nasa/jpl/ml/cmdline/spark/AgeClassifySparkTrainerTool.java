@@ -46,7 +46,6 @@ import gov.nasa.jpl.ml.cmdline.params.SparkTrainingToolParams;
 import gov.nasa.jpl.ml.cmdline.CLI;
 
 import gov.nasa.jpl.ml.spark.authorage.AgeClassifySparkTrainer;
-import gov.nasa.jpl.ml.spark.authorage.AgeClassifyContextGeneratorWrapper;
 
 /**
  * TODO: Documentation
@@ -129,13 +128,11 @@ public class AgeClassifySparkTrainerTool
 	
 	System.out.println("Feature Generators: " + params.getFeatureGenerators());
 	System.out.println("Tokenizer: " + params.getTokenizer());
-	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(
-	    params.getTokenizer(), params.getFeatureGenerators());
-	
+
 	AgeClassifyModel model;
 	try {
 	    model = AgeClassifySparkTrainer.createModel(params.getLang(), params.getData(),
-							wrapper, mlParams);
+	        params.getTokenizer(), params.getFeatureGenerators(), mlParams);
 	} catch (IOException e) {
 	    throw new TerminateToolException(-1,
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);

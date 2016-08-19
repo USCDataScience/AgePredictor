@@ -17,9 +17,15 @@
 
 package opennlp.tools.util.featuregen;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.List;
 
 import opennlp.tools.util.InvalidFormatException;
 
@@ -30,6 +36,16 @@ public class BagOfWordsFeatureGenerator implements FeatureGenerator {
     
     public static final BagOfWordsFeatureGenerator INSTANCE = new BagOfWordsFeatureGenerator();
 
+    private static List<String> stopwords = new ArrayList<String>();
+   
+    static {
+	try {
+	    stopwords = FileUtils.readLines(new File("props/stopwords.txt"), "utf-8");
+	} catch (IOException e) {
+	    stopwords = new ArrayList<String>();
+	}
+    }
+    
     public BagOfWordsFeatureGenerator() {
     }
     
@@ -39,7 +55,9 @@ public class BagOfWordsFeatureGenerator implements FeatureGenerator {
 	Collection<String> bagOfWords = new ArrayList<String>(text.length);
 
 	for (String word : text) {
-	    bagOfWords.add("bow=" + word);
+	    if (!stopwords.contains(word)) {
+		bagOfWords.add("bow=" + word);
+	    }
 	}
 
 	return bagOfWords;

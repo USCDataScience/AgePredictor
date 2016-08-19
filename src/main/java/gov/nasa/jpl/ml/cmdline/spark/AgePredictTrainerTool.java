@@ -15,78 +15,102 @@
  * limitations under the License.
  */
 
-package gov.nasa.jpl.ml.cmdline.authorage;
+package gov.nasa.jpl.ml.cmdline.spark.authorage;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import opennlp.tools.cmdline.AbstractTrainerTool;
+import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.TerminateToolException;
-import opennlp.tools.cmdline.ObjectStreamFactory;
-import opennlp.tools.cmdline.StreamFactoryRegistry;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.WhitespaceTokenizer;
-import opennlp.tools.util.ext.ExtensionLoader;
-import opennlp.tools.util.model.ModelUtil;
-
-import opennlp.tools.authorage.AgeClassifyFactory;
-import opennlp.tools.authorage.AgeClassifyME;
-import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.authorage.AuthorAgeSample;
-import opennlp.tools.authorage.AuthorAgeSampleStream;
 import opennlp.tools.cmdline.ArgumentParser;
 
+import opennlp.tools.util.ext.ExtensionLoader;
+import opennlp.tools.util.model.ModelUtil;
+import opennlp.tools.util.InvalidFormatException;
+
+import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.authorage.AgeClassifyFactory;
+import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.ml.AgeClassifyTrainerFactory;
 import opennlp.tools.util.TrainingParameters;
-
-import gov.nasa.jpl.ml.cmdline.params.ClassifyTrainingToolParams;
-
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.featuregen.FeatureGenerator;
 import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
 
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.mllib.regression.LinearRegressionModel;
+
+import gov.nasa.jpl.ml.cmdline.params.PredictTrainingToolParams;
 import gov.nasa.jpl.ml.cmdline.CLI;
+
+import gov.nasa.jpl.ml.spark.authorage.AgePredictSGDTrainer;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
 
 /**
  * TODO: Documentation
  */
-public class AgeClassifyTrainerTool 
-    extends AbstractTrainerTool<AuthorAgeSample, ClassifyTrainingToolParams> {
+public class AgePredictTrainerTool extends BasicCmdLineTool { 
+    private Class paramsClass;
+    private PredictTrainingToolParams params;
     
-    public AgeClassifyTrainerTool() {
-	super(AuthorAgeSample.class, ClassifyTrainingToolParams.class);
+    public AgePredictTrainerTool() {
+	this.paramsClass = PredictTrainingToolParams.class;
     }
-     
+    
     @Override
     public String getShortDescription() {
-	return "trainer for the author age classifier";
+	return "trainer for the age predictor";
     }
     
     @Override
-    @SuppressWarnings({"unchecked"})
-    public String getHelp(String format) {
-	if ("".equals(format) || StreamFactoryRegistry.DEFAULT_FORMAT.equals(format)) {
-	    return getBasicHelp(paramsClass,
-				StreamFactoryRegistry.getFactory(type, StreamFactoryRegistry.DEFAULT_FORMAT)
-				.<ClassifyTrainingToolParams>getParameters());
-	} else {
-	    ObjectStreamFactory<AuthorAgeSample> factory = StreamFactoryRegistry.getFactory(type, format);
-	    if (null == factory) {
-		throw new TerminateToolException(1, "Format " + format + " is not found.\n" + getHelp());
-	    }
-	    return "Usage: " + CLI.CMD + " " + getName() + " " +
-		ArgumentParser.createUsage(paramsClass, factory.<ClassifyTrainingToolParams>getParameters());
+    public String getHelp() {
+	return "Usage: " + CLI.CMD + " " + getName() + " " +
+	    ArgumentParser.createUsage(this.paramsClass);
+    }
+    
+    @Override
+    public void run(String[] args) {
+	String errMessage = ArgumentParser.validateArgumentsLoudly(args, this.paramsClass);
+	if (null != errMessage) {
+	    throw new TerminateToolException(1, errMessage + "\n" + getHelp());
 	}
-    }
-    
-    @Override
-    public void run(String format, String[] args) {
-	super.run(format, args);
 	
+	SparkSession spark = SparkSession
+	    .builder()
+	    .appName("AgePredictTrainer")
+	    .getOrCreate();
+
+	params = (PredictTrainingToolParams) ArgumentParser.parse(
+	    ArgumentParser.filter(args, this.paramsClass), this.paramsClass);
+	
+	System.out.println("Feature Generators: " + params.getFeatureGenerators());
+	System.out.println("Tokenizer: " + params.getTokenizer());
+	
+	try {
+	    AgePredictSGDTrainer.generateEvents(spark, params.getData(), params.getTokenizer(),
+					 params.getFeatureGenerators(), params.getEvents());
+	} catch (IOException e) {
+            throw new TerminateToolException(-1,
+	        "IO error while reading training data or indexing data: " + e.getMessage(), e);
+        }
+	
+	FeatureGenerator[] featureGenerators = createFeatureGenerators(params
+	    .getFeatureGenerators());
+	Tokenizer tokenizer = createTokenizer(params.getTokenizer());
+
+	AgeClassifyFactory factory = null; 
+	try {
+	    AgeClassifyFactory.create("AgeClassifyFactory", tokenizer, featureGenerators);
+	} catch (InvalidFormatException e) {
+	    e.printStackTrace();
+	    return;
+	}
 	TrainingParameters mlParams = null;
-	
+
 	// load training parameters
 	String paramFile = params.getParams();
 	if (paramFile != null) {
@@ -108,47 +132,27 @@ public class AgeClassifyTrainerTool
 		    //handle error?
 		}
 	    }
-	    
-	    if (!AgeClassifyTrainerFactory.isValid(mlParams.getSettings())) {
-		throw new TerminateToolException(1, "Training parameters file '" + paramFile + "' is invalid!");    
-	    }
 	}
 	if (mlParams == null) {
-	    mlParams = ModelUtil.createDefaultTrainingParameters();
+	    mlParams = new TrainingParameters();
+	    mlParams.put(TrainingParameters.ITERATIONS_PARAM, Integer.toString(100));
+	    mlParams.put(TrainingParameters.CUTOFF_PARAM, Integer.toString(5));
 	}
-	
-	// load output model file
+		
 	File modelOutFile = params.getModel();
 	
-	CmdLineUtil.checkOutputFile("age classifier model", modelOutFile);
-	
-	System.out.println("Feature Generators: " + params.getFeatureGenerators());
-	FeatureGenerator[] featureGenerators = createFeatureGenerators(params
-            .getFeatureGenerators());
-	
-	System.out.println("Tokenizer: " + params.getTokenizer());
-	Tokenizer tokenizer = createTokenizer(params.getTokenizer());
-	
-	AgeClassifyModel model;
+	AgePredictModel model;
 	try {
-	    AgeClassifyFactory factory = AgeClassifyFactory.create("AgeClassifyFactory", tokenizer, featureGenerators);
-	    model = AgeClassifyME.train(params.getLang(), sampleStream, mlParams,
-					factory);
+	    model = AgePredictSGDTrainer.createModel(params.getLang(), spark, params.getEvents(), factory, mlParams);
 	} catch (IOException e) {
 	    throw new TerminateToolException(-1,
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);
-	} finally {
-	    try {
-		sampleStream.close();
-	    } catch (IOException e) {
-		// handle error
-	    }
-	}
-	
-	CmdLineUtil.writeModel("age classifier", modelOutFile, model);
+	} 
+
+	CmdLineUtil.writeModel("age predictor", modelOutFile, model);
+	spark.stop();
     }
     
-
     private static Tokenizer createTokenizer(String tokenizer) {
 	if(tokenizer != null) {
 	    return ExtensionLoader.instantiateExtension(Tokenizer.class, tokenizer);
@@ -166,7 +170,7 @@ public class AgeClassifyTrainerTool
 	FeatureGenerator[] featureGenerators = new FeatureGenerator[classes.length];
 	for (int i = 0; i < featureGenerators.length; i++) {
 	    featureGenerators[i] = ExtensionLoader.instantiateExtension(
-				       FeatureGenerator.class, classes[i]);
+									FeatureGenerator.class, classes[i]);
 	}
 	return featureGenerators;
     }

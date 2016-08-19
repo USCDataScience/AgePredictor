@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
@@ -31,15 +31,12 @@ import opennlp.tools.ml.model.Event;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.util.TrainingParameters;
 import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.ObjectStreamUtil;
 
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.TerminateToolException;
 
 import opennlp.tools.authorage.AgeClassifyFactory;
 import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.authorage.AuthorAgeSample;
-import opennlp.tools.authorage.AuthorAgeSampleStream;
 import opennlp.tools.ml.AgeClassifyTrainerFactory;
 
 import org.apache.spark.api.java.JavaSparkContext;
@@ -52,67 +49,47 @@ import org.apache.spark.storage.StorageLevel;
  * TODO: Documentation
  */
 public class AgeClassifySparkTrainer {
-
-    public static ObjectStream<AuthorAgeSample> createObjectStream(final JavaRDD<AuthorAgeSample> samples) {
-	
-	return new ObjectStream<AuthorAgeSample>() {
-	    private Iterator<AuthorAgeSample> iterator = samples.toLocalIterator();
-	    
-	    public AuthorAgeSample read() {
-		if (iterator.hasNext()) {
-		    return iterator.next();
-		}
-		else {
-		    return null;
-		}
-	    }
-	        
-	    public void reset() {
-		iterator = samples.toLocalIterator();
-	    }
-	        
-	    public void close() {
-	    }
-	        
-	};    
-	
-    }
-
     
     public static AgeClassifyModel createModel(String languageCode, String dataIn,
-					       AgeClassifyContextGeneratorWrapper wrapper,
+					       String tokenizer, String featureGenerators,
 					       TrainingParameters trainParams) throws IOException {
 	
 	SparkConf conf = new SparkConf().setAppName("AgeClassifySparkTrainer");
 	JavaSparkContext sc = new JavaSparkContext(conf);
 	
+	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(
+	    tokenizer, featureGenerators);
+
 	JavaRDD<String> data = sc.textFile(dataIn, 8).cache();
-	JavaRDD<AuthorAgeSample> samples = data.map(new CreateAuthorAgeSamples(wrapper)).filter(
-            new Function<AuthorAgeSample, Boolean>() {
+	JavaRDD<EventWrapper> samples = data.map(new CreateEvents(wrapper)).cache();
+	    
+	JavaRDD<EventWrapper> validSamples = samples.filter(
+            new Function<EventWrapper, Boolean>() {
 		@Override
-		public Boolean call(AuthorAgeSample s) { return s != null; }
+		public Boolean call(EventWrapper s) { return s != null; }
 	    }).cache();
 	
-	ObjectStream<AuthorAgeSample> sampleStream = createObjectStream(samples);
-	ObjectStream<Event> eventStream = new AgeClassifyEventStream(sampleStream);
+	//ObjectStream<Event> eventStream = EventStreamUtil.createEventStream(samples);	
+	ObjectStream<Event> eventStream = EventStreamUtil.createEventStream(validSamples.collect());
 	
 	Map<String, String> entries = new HashMap<String, String>();
-						    
-						    
+					       					    
 	EventTrainer trainer = AgeClassifyTrainerFactory
             .getEventTrainer(trainParams.getSettings(), entries);
         MaxentModel ageModel = trainer.train(eventStream);
 	
-	data.unpersist();
 	samples.unpersist();
-
+	data.unpersist();
+	
 	sc.stop();
 	
 	Map<String, String> manifestInfoEntries = new HashMap<String, String>();
-	return new AgeClassifyModel(languageCode, ageModel, manifestInfoEntries,
-				    new AgeClassifyFactory(wrapper.getTokenizer(), wrapper.getFeatureGenerators()));
+	
+	AgeClassifyFactory factory = AgeClassifyFactory.create("AgeClassifyFactory", 
+            wrapper.getTokenizer(), wrapper.getFeatureGenerators());
+	return new AgeClassifyModel(languageCode, ageModel, manifestInfoEntries, factory);
     }
-    
+	    
     public static void main(String[] args) {
 	if (args.length < 2) {
 	    System.out.println("usage: <input> <output>\n");
@@ -127,12 +104,10 @@ public class AgeClassifySparkTrainer {
 	params.put(TrainingParameters.ITERATIONS_PARAM, Integer.toString(100));
 	//params.put(TrainingParameters.ALGORITHM_PARAM, NaiveBayesTrainer.NAIVE_BAYES_VALUE);
 	
-	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper("opennlp.tools.tokenize.SentenceTokenizer",
-	    "opennlp.tools.tokenize.BagOfWordsTokenizer");
-	
 	AgeClassifyModel model;
 	try {
-	    model = AgeClassifySparkTrainer.createModel("en", input, wrapper, params);
+	    model = AgeClassifySparkTrainer.createModel("en", input, 
+	        "opennlp.tools.tokenize.SentenceTokenizer", "opennlp.tools.tokenize.BagOfWordsTokenizer", params);
 	} catch (IOException e) {
 	    throw new TerminateToolException(-1,
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);

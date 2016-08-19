@@ -139,8 +139,7 @@ public class AgeClassifySparkEvaluator {
 	correct.unpersist();
 
 	List<Tuple2<String, Integer>> correctCount = correctMap.collect();
-	
-	
+		
 	for (int i = 0; i < totalCount.size(); i++) {
 	    if (totalCount.get(i)._2() > 0) {
 		System.out.println(totalCount.get(i)._1() + ": " + totalCount.get(i)._2() + " documents");

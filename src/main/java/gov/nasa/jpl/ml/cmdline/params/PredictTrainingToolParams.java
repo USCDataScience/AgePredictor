@@ -19,16 +19,19 @@ package gov.nasa.jpl.ml.cmdline.params;
 
 import java.io.File;
 
-import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
-import opennlp.tools.cmdline.params.TrainingToolParams;
 import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
+import opennlp.tools.cmdline.params.TrainingToolParams;
+import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 
-/**
- * TODO: Documentation
- */
-public interface ClassifyTrainingToolParams extends TrainingToolParams {
+public interface PredictTrainingToolParams extends TrainingToolParams {
+    @ParameterDescription(valueName = "sampleData", description = "data to be used, usually a file name.")
+    String getData();
+    
+    @ParameterDescription(valueName = "events", description = "output directory to store events.")
+    String getEvents();
+    
     @ParameterDescription(valueName = "featuregens", 
-        description = "Comma separated feature generator classes. Bag of words default.")
+	description = "Comma separated feature generator classes. Bag of words default.")
     @OptionalParameter
     String getFeatureGenerators();
 
@@ -36,5 +39,5 @@ public interface ClassifyTrainingToolParams extends TrainingToolParams {
         description = "Tokenizer implementation. WhitespaceTokenizer is used if not specified.")
     @OptionalParameter
     String getTokenizer();
-    
+
 }

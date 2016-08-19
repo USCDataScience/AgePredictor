@@ -27,18 +27,20 @@ import opennlp.tools.util.featuregen.FeatureGenerator;
 
 import org.apache.spark.api.java.function.Function;
 
-public class CreateAuthorAgeSamples implements Function<String, AuthorAgeSample> {
+public class CreateEvents implements Function<String, EventWrapper> {
     private AgeClassifyContextGeneratorWrapper wrapper;
+    private boolean printEvents;
     
-    public CreateAuthorAgeSamples(String tok, String fg) {
+    public CreateEvents(String tok, String fg, boolean printEvents) {
 	this.wrapper = new AgeClassifyContextGeneratorWrapper(tok, fg);
     }
     
-    public CreateAuthorAgeSamples(AgeClassifyContextGeneratorWrapper w) {
+    public CreateEvents(AgeClassifyContextGeneratorWrapper w) {
 	this.wrapper = w;
     }
     
-    public AuthorAgeSample call(String s) {
+    @Override
+    public EventWrapper call(String s) {
 	String category;
 	String text;
 
@@ -64,16 +66,17 @@ public class CreateAuthorAgeSamples implements Function<String, AuthorAgeSample>
 	}
 	
 	String features[] = context.toArray(new String[context.size()]); 
-	System.out.println("AuthorAgeSample: " + Arrays.toString(features));
+	System.out.println("Event: " + Arrays.toString(features));
 	
 	if (features.length > 0) {
 	    //input can be both an age number or age category
 	    try {
 		int age = Integer.valueOf(category);
-		return new AuthorAgeSample(age, features);
+		
+		return new EventWrapper(age, features);
 	    } catch (NumberFormatException e) {
 		//try category as a string
-		return new AuthorAgeSample(category, features); 
+		return new EventWrapper(category, features); 
 	    } catch (Exception e) {
 		return null;
 	    }
@@ -82,5 +85,6 @@ public class CreateAuthorAgeSamples implements Function<String, AuthorAgeSample>
 	    return null;
 	}
     }
+    
 }
     
