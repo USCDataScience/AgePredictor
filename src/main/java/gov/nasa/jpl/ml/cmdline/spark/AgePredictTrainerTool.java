@@ -32,7 +32,6 @@ import opennlp.tools.util.model.ModelUtil;
 import opennlp.tools.util.InvalidFormatException;
 
 import opennlp.tools.authorage.AuthorAgeSample;
-import opennlp.tools.authorage.AgeClassifyFactory;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.ml.AgeClassifyTrainerFactory;
 import opennlp.tools.util.TrainingParameters;
@@ -42,13 +41,13 @@ import opennlp.tools.util.featuregen.FeatureGenerator;
 import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
 
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.mllib.regression.LinearRegressionModel;
 
 import gov.nasa.jpl.ml.cmdline.params.PredictTrainingToolParams;
 import gov.nasa.jpl.ml.cmdline.CLI;
 
 import gov.nasa.jpl.ml.spark.authorage.AgePredictSGDTrainer;
 import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import gov.nasa.jpl.ml.spark.authorage.AgeClassifyContextGeneratorWrapper;
 
 /**
  * TODO: Documentation
@@ -98,17 +97,11 @@ public class AgePredictTrainerTool extends BasicCmdLineTool {
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);
         }
 	
-	FeatureGenerator[] featureGenerators = createFeatureGenerators(params
-	    .getFeatureGenerators());
-	Tokenizer tokenizer = createTokenizer(params.getTokenizer());
+	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(params.getFeatureGenerators(),
+	    params.getTokenizer());
+	FeatureGenerator[] featureGenerators = wrapper.getFeatureGenerators();
+	Tokenizer tokenizer = wrapper.getTokenizer();
 
-	AgeClassifyFactory factory = null; 
-	try {
-	    AgeClassifyFactory.create("AgeClassifyFactory", tokenizer, featureGenerators);
-	} catch (InvalidFormatException e) {
-	    e.printStackTrace();
-	    return;
-	}
 	TrainingParameters mlParams = null;
 
 	// load training parameters
@@ -143,13 +136,13 @@ public class AgePredictTrainerTool extends BasicCmdLineTool {
 	
 	AgePredictModel model;
 	try {
-	    model = AgePredictSGDTrainer.createModel(params.getLang(), spark, params.getEvents(), factory, mlParams);
+	    model = AgePredictSGDTrainer.createModel(params.getLang(), spark, params.getEvents(), wrapper, mlParams);
 	} catch (IOException e) {
 	    throw new TerminateToolException(-1,
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);
 	} 
-
-	CmdLineUtil.writeModel("age predictor", modelOutFile, model);
+	
+	AgePredictModel.writeModel(model, modelOutFile);
 	spark.stop();
     }
     
@@ -170,7 +163,7 @@ public class AgePredictTrainerTool extends BasicCmdLineTool {
 	FeatureGenerator[] featureGenerators = new FeatureGenerator[classes.length];
 	for (int i = 0; i < featureGenerators.length; i++) {
 	    featureGenerators[i] = ExtensionLoader.instantiateExtension(
-									FeatureGenerator.class, classes[i]);
+	         FeatureGenerator.class, classes[i]);
 	}
 	return featureGenerators;
     }

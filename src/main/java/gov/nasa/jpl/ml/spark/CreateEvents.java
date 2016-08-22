@@ -29,9 +29,8 @@ import org.apache.spark.api.java.function.Function;
 
 public class CreateEvents implements Function<String, EventWrapper> {
     private AgeClassifyContextGeneratorWrapper wrapper;
-    private boolean printEvents;
     
-    public CreateEvents(String tok, String fg, boolean printEvents) {
+    public CreateEvents(String tok, String fg) {
 	this.wrapper = new AgeClassifyContextGeneratorWrapper(tok, fg);
     }
     
@@ -66,17 +65,20 @@ public class CreateEvents implements Function<String, EventWrapper> {
 	}
 	
 	String features[] = context.toArray(new String[context.size()]); 
-	System.out.println("Event: " + Arrays.toString(features));
 	
 	if (features.length > 0) {
 	    //input can be both an age number or age category
 	    try {
 		int age = Integer.valueOf(category);
 		
-		return new EventWrapper(age, features);
+		EventWrapper event = new EventWrapper(age, features);
+		System.out.println("Event: " + event);
+		return event;
 	    } catch (NumberFormatException e) {
+		
 		//try category as a string
-		return new EventWrapper(category, features); 
+		EventWrapper event =  new EventWrapper(category, features); 
+		return event;
 	    } catch (Exception e) {
 		return null;
 	    }

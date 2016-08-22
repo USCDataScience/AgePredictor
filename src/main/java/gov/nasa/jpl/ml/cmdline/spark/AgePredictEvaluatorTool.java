@@ -23,12 +23,12 @@ import opennlp.tools.cmdline.StreamFactoryRegistry;
 import opennlp.tools.cmdline.params.EvaluatorParams;
 import opennlp.tools.cmdline.AbstractEvaluatorTool;
 import opennlp.tools.cmdline.TerminateToolException;
-
 import opennlp.tools.authorage.AuthorAgeSample;
 
-import gov.nasa.jpl.ml.cmdline.params.SparkEvalToolParams;
+import org.apache.spark.sql.SparkSession;
 
-import gov.nasa.jpl.ml.spark.authorage.AgeClassifySparkEvaluator;
+import gov.nasa.jpl.ml.cmdline.params.PredictEvalToolParams;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictEvaluator;
 import gov.nasa.jpl.ml.cmdline.CLI;
 
 import java.io.IOException;
@@ -36,16 +36,16 @@ import java.io.IOException;
 /**
  * TODO: Documentation
  */ 
-public class AgeClassifySparkEvaluatorTool 
-    extends AbstractEvaluatorTool<AuthorAgeSample, SparkEvalToolParams> {
+public class AgePredictEvaluatorTool 
+    extends AbstractEvaluatorTool<AuthorAgeSample, PredictEvalToolParams> {
 
-    public AgeClassifySparkEvaluatorTool() {
-	super(AuthorAgeSample.class, SparkEvalToolParams.class);
+    public AgePredictEvaluatorTool() {
+	super(AuthorAgeSample.class, PredictEvalToolParams.class);
     }
     
      @Override
 	 public String getShortDescription() {
-	 return "measures the performance of the AgeClassify model with the reference data";
+	 return "measures the performance of the AgePredict model with the reference data";
      }
      
      @Override
@@ -54,24 +54,29 @@ public class AgeClassifySparkEvaluatorTool
 	 if ("".equals(format) || StreamFactoryRegistry.DEFAULT_FORMAT.equals(format)) {
 	     return getBasicHelp(paramsClass,
 				 StreamFactoryRegistry.getFactory(type, StreamFactoryRegistry.DEFAULT_FORMAT)
-				 .<SparkEvalToolParams>getParameters());
+				 .<PredictEvalToolParams>getParameters());
 	 } else {
 	     ObjectStreamFactory<AuthorAgeSample> factory = StreamFactoryRegistry.getFactory(type, format);
 	     if (null == factory) {
 		 throw new TerminateToolException(1, "Format " + format + " is not found.\n" + getHelp());
 	     }
 	     return "Usage: " + CLI.CMD + " " + getName() + " " +
-		 ArgumentParser.createUsage(paramsClass, factory.<SparkEvalToolParams>getParameters());
+		 ArgumentParser.createUsage(paramsClass, factory.<PredictEvalToolParams>getParameters());
 	 }
      }
      
      public void run(String format, String[] args) {
 	 validateAllArgs(args, this.paramsClass, format);
 	 
+	 SparkSession spark = SparkSession
+	     .builder()
+	     .appName("AgePredictEvaluator")
+	     .getOrCreate();
+
 	 params = ArgumentParser.parse(ArgumentParser.filter(args, this.paramsClass), this.paramsClass);
 	 try {
-	     AgeClassifySparkEvaluator.evaluate(params.getModel(), params.getData());
-	     
+	     AgePredictEvaluator.evaluate(spark, params.getClassifyModel(), params.getModel(), params.getReport(), 
+					  params.getData());
 	 } catch (IOException e) {
 	     System.err.println("failed");
 	     throw new TerminateToolException(-1, "IO error while reading test data: "

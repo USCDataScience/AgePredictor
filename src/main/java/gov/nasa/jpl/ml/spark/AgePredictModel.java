@@ -17,60 +17,81 @@
 
 package gov.nasa.jpl.ml.spark.authorage;
 
+import java.io.Serializable;
 import java.io.File;
 import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 
-import opennlp.tools.authorage.AgeClassifyFactory;
-import opennlp.tools.util.model.BaseModel;
-import opennlp.tools.util.InvalidFormatException;
-
 import org.apache.spark.ml.Model;
 import org.apache.spark.ml.feature.CountVectorizerModel;
-import org.apache.spark.mllib.regression.LinearRegressionModel;
+import org.apache.spark.mllib.regression.LassoModel;
 
 /**
- * TODO: Documentation
+ * Wrapper for all the components needed for the Regression model. Supports serialization
+ * and deserialization from file.
  */
-public class AgePredictModel extends BaseModel {
-    private static final String COMPONENT_NAME = "AgePredictSGD";
+public class AgePredictModel implements Serializable {
+    private String languageCode;
+    private LassoModel model;
+    private String[] vocabulary;
+    private AgeClassifyContextGeneratorWrapper wrapper;
     
-    private static final String AGEPREDICT_MODEL_ENTRY_NAME = "agepredict.model";
-    private static final String VOCABULARY_ENTRY_NAME = "agepredict.vocab";
-    
-    public AgePredictModel(String languageCode, LinearRegressionModel agePredictModel,
-			   String[] vocabulary, Map<String, String> manifestInfoEntries,
-			   AgeClassifyFactory factory) {
+    public AgePredictModel(String languageCode, LassoModel agePredictModel, String[] vocabulary,
+			   AgeClassifyContextGeneratorWrapper wrapper) {
 
-	super(COMPONENT_NAME, languageCode, manifestInfoEntries, factory);
-	artifactMap.put(AGEPREDICT_MODEL_ENTRY_NAME, agePredictModel);
-	artifactMap.put(VOCABULARY_ENTRY_NAME, vocabulary);
+	this.languageCode = languageCode;
+	this.model = agePredictModel;
+	this.vocabulary = vocabulary;
+	this.wrapper = wrapper;
+    }
+    
+    public static AgePredictModel readModel(File file) throws IOException {
+	//deserialize from file
+	AgePredictModel model;
+	try{
+	    FileInputStream fin = new FileInputStream(file);
+	    ObjectInputStream ois = new ObjectInputStream(fin);
+	    model = (AgePredictModel) ois.readObject();
+	    ois.close();
+
+	    return model;
+
+	}catch(Exception e){
+	    e.printStackTrace();
+	    return null;
+	}
 	
-	checkArtifactMap();
-	
     }
     
-    public AgePredictModel(URL modelURL)
-	throws IOException, InvalidFormatException {
-	super(COMPONENT_NAME, modelURL);
+    public AgeClassifyContextGeneratorWrapper getContext() {
+	return this.wrapper;
     }
     
-    public AgePredictModel(File file) throws InvalidFormatException, IOException {
-	super(COMPONENT_NAME, file);
-    }
-    
-    public AgeClassifyFactory getFactory() {
-	return (AgeClassifyFactory) this.toolFactory;
-    }
-    
-    public LinearRegressionModel getModel() {
-	return (LinearRegressionModel) artifactMap.get(AGEPREDICT_MODEL_ENTRY_NAME);
+    public LassoModel getModel() {
+	return this.model;
     }
     
     public String[] getVocabulary() {
-	return (String[]) artifactMap.get(VOCABULARY_ENTRY_NAME);
+	return this.vocabulary;
+    }
+    
+    public static void writeModel(AgePredictModel model, File file) {
+	try {
+	    //serialize to file
+	    FileOutputStream fout = new FileOutputStream(file);
+	    ObjectOutputStream oos = new ObjectOutputStream(fout);
+	    oos.writeObject(model);
+	    oos.close();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	
     }
     
 }

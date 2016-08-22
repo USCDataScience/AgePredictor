@@ -22,16 +22,20 @@ import java.io.File;
 import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
 import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 
-/**
- * Common evaluation parameters.
- *
- * Note: Do not use this class, internal use only!
- */
-public interface SparkEvaluatorToolParams {
+public interface PredictEvalToolParams {
+   
+    @ParameterDescription(valueName = "classify model", description = "the classifier model file.")
+    @OptionalParameter
+	File getClassifyModel();
 
     @ParameterDescription(valueName = "model", description = "the model file to be evaluated.")
 	File getModel();
-
+    
+    @ParameterDescription(valueName = "outputFile", description = "the path of the report file.")
+    @OptionalParameter
+        File getReport();
+    
     @ParameterDescription(valueName = "sampleData", description = "data to be used, usually a file name.")
 	String getData();
+
 }

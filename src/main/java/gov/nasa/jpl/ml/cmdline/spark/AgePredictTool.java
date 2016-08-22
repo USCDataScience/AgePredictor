@@ -38,7 +38,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.ml.feature.CountVectorizerModel;
-import org.apache.spark.mllib.regression.LinearRegressionModel;
+import org.apache.spark.mllib.regression.LassoModel;
 
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AgeClassifyME;
@@ -79,7 +79,7 @@ public class AgePredictTool extends BasicCmdLineTool {
 		AgeClassifyModel classifyModel = new AgeClassifyModel(new File(args[0]));
 
 		classify = new AgeClassifyME(classifyModel);
-		model = new AgePredictModel(new File(args[1]));
+		model = AgePredictModel.readModel(new File(args[1]));
 	    } catch (Exception e) {
 		e.printStackTrace();
 		return;
@@ -87,7 +87,7 @@ public class AgePredictTool extends BasicCmdLineTool {
 	}
 	else if (args.length == 2) {
 	    try {
-		model = new AgePredictModel(new File(args[0]));
+		model = AgePredictModel.readModel(new File(args[0]));
 	    } catch (Exception e) {
 		e.printStackTrace();
 		return;
@@ -111,9 +111,9 @@ public class AgePredictTool extends BasicCmdLineTool {
 	        new PlainTextByLineStream(new SystemInputStreamFactory(), SystemInputStreamFactory.encoding()));
 	    
 	    String document;
-	    FeatureGenerator[] featureGenerators = model.getFactory().getFeatureGenerators();
+	    FeatureGenerator[] featureGenerators = model.getContext().getFeatureGenerators();
 	    while ((document = documentStream.read()) != null) {
-	        String[] tokens = model.getFactory().getTokenizer().tokenize(document);
+	        String[] tokens = model.getContext().getTokenizer().tokenize(document);
 
 		double prob[] = classify.getProbabilities(tokens);
 		String category = classify.getBestCategory(prob);
@@ -125,10 +125,15 @@ public class AgePredictTool extends BasicCmdLineTool {
 			featureGenerator.extractFeatures(tokens);
 		    context.addAll(extractedFeatures);
 		}
-		if (category != null)
-		    context.add("cat="+ category);
 		
-		data.add(RowFactory.create(document, context));	
+		if (category != null) {
+		    for (int i = 0; i < tokens.length / 9; i++) {
+			context.add("cat="+ category);
+		    }
+		}
+		if (context.size() > 0) {
+		    data.add(RowFactory.create(document, context.toArray()));
+		}	
 	    } 
 	} catch (IOException e) {
 		CmdLineUtil.handleStdinIoError(e);
@@ -146,7 +151,7 @@ public class AgePredictTool extends BasicCmdLineTool {
 	
 	JavaRDD<Row> events = cvm.transform(df).javaRDD();
 
-	final LinearRegressionModel linModel = model.getModel();
+	final LassoModel linModel = model.getModel();
 	events.foreach( new VoidFunction<Row>() {
 		public void call(Row event) {
 		    double prediction = linModel.predict((Vector) event.getAs("feature"));

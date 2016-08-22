@@ -29,6 +29,12 @@ if [[ $COMMAND == *"Spark"* ]]; then
 	--executor-memory 12g --conf spark.storage.memoryFraction=0.8 \
 	--conf spark.ui.port=9776\
         $JAR "$@"
+elif [[ $COMMAND == *"Predict"* ]]; then 
+    $SPARK_HOME/bin/spark-submit --verbose --master local[8] \
+	--driver-memory 16g --conf spark.driver.maxResultSize=12g \
+	--executor-memory 12g --conf spark.storage.memoryFraction=0.8 \
+	--conf spark.ui.port=9776\
+        $JAR "$@"
 else
     java -jar -Xmx8g $JAR $@
 fi

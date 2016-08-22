@@ -28,22 +28,28 @@ import java.util.HashMap;
 import scala.Tuple2;
 
 import opennlp.tools.util.TrainingParameters;
-import opennlp.tools.authorage.AgeClassifyFactory;
 
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.api.java.JavaDoubleRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.ml.linalg.SparseVector;
+import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.linalg.Vector;
+
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.*;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.mllib.regression.LassoModel;
+import org.apache.spark.mllib.regression.LassoWithSGD;
 import org.apache.spark.mllib.regression.LabeledPoint;
-import org.apache.spark.mllib.regression.LinearRegressionModel;
-import org.apache.spark.mllib.regression.LinearRegressionWithSGD;
 
 import org.apache.spark.ml.feature.CountVectorizer;
 import org.apache.spark.ml.feature.CountVectorizerModel;
 
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 
 import org.apache.commons.io.FileUtils;
 
@@ -61,17 +67,17 @@ public class AgePredictSGDTrainer {
     public static void generateEvents(SparkSession spark, String dataIn, 
 				      String tokenizer, String featureGenerators,
 				      String outDir) throws IOException {
-		
+	
 	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(
 	    tokenizer, featureGenerators);
-
-	JavaRDD<String> data = spark.sparkContext().textFile(dataIn, 8).toJavaRDD()
+	
+	JavaRDD<String> data = spark.sparkContext().textFile(dataIn, 48).toJavaRDD()
 	    .cache();
 	
 	JavaRDD<EventWrapper> samples = data.map(new CreateEvents(wrapper)).cache();
 	
 	JavaRDD<EventWrapper> validSamples = samples.filter(
-            new Function<EventWrapper, Boolean>() {
+	    new Function<EventWrapper, Boolean>() {
 		@Override
 		public Boolean call(EventWrapper s) { 
 		    if (s != null) {
@@ -82,9 +88,10 @@ public class AgePredictSGDTrainer {
 	    }).repartition(8);
 	
 	File dir = new File(outDir);
-	FileUtils.cleanDirectory(dir); //clean out directory (this is optional -- but good know)
-	FileUtils.forceDelete(dir); //delete directory
-	FileUtils.forceMkdir(dir);
+	if (dir.exists()) {
+	    FileUtils.cleanDirectory(dir); //clean out directory (this is optional -- but good know)
+	    FileUtils.forceDelete(dir); //delete directory
+	}
 	
 	validSamples.saveAsTextFile(outDir);
     }
@@ -110,8 +117,8 @@ public class AgePredictSGDTrainer {
     }
 
     public static AgePredictModel createModel(String languageCode, SparkSession spark, 
-				       String eventDir, AgeClassifyFactory factory,
-				       TrainingParameters trainParams) throws IOException {
+					      String eventDir, AgeClassifyContextGeneratorWrapper wrapper,
+					      TrainingParameters trainParams) throws IOException {
 	
 	Map<String, String> params = trainParams.getSettings();
 	
@@ -121,9 +128,9 @@ public class AgePredictSGDTrainer {
 	JavaRDD<String> data = spark.sparkContext().textFile(eventDir, 8).toJavaRDD()
 	    .cache();
 	
-	JavaRDD<EventWrapper> samples = data.map(
-	    new Function<String, EventWrapper>() {
-		public EventWrapper call(String s) {
+	JavaRDD<Row> samples = data.map(
+	    new Function<String, Row>() {
+		public Row call(String s) {
 		    String[] parts = s.split(",");
 		    
 		    if (parts[0] != "-1") {
@@ -133,26 +140,28 @@ public class AgePredictSGDTrainer {
 			//add in the category as another feature
 			List<String> tokens= new ArrayList<String>(Arrays.asList(text));
 			tokens.add("cat=" + parts[1]);
-			
-			String[] context = tokens.toArray(new String[tokens.size()]);
-			
-			return new EventWrapper(value, context);
+						    
+			return RowFactory.create(value, tokens.toArray());
 		    } else {
 			return null;
 		    }
 		}
 	    }).cache();
 	
-	JavaRDD<EventWrapper> validSamples = samples.filter(
-	    new Function<EventWrapper, Boolean>() {
+	JavaRDD<Row> validSamples = samples.filter(
+	    new Function<Row, Boolean>() {
                 @Override
-                public Boolean call(EventWrapper s) { return s != null; }
+                public Boolean call(Row s) { return s != null; }
 	    }).cache();
 	
 	samples.unpersist();
-	    
-	Dataset<Row> eventDF = spark.createDataFrame(validSamples, EventWrapper.class).cache();
 	
+	StructType schema = new StructType(new StructField [] {
+                new StructField("value", DataTypes.IntegerType, false, Metadata.empty()),
+		new StructField("context", new ArrayType(DataTypes.StringType, true), false, Metadata.empty())
+            });
+
+	Dataset<Row> eventDF = spark.createDataFrame(validSamples, schema).cache();
 	
 	CountVectorizerModel cvm = new CountVectorizer()
 	    .setInputCol("context")
@@ -168,16 +177,18 @@ public class AgePredictSGDTrainer {
 	    new Function<Row, LabeledPoint>() {
 		public LabeledPoint call(Row r) {
 		    Integer val = r.getInt(0);
-		    Vector features = (Vector)r.get(1);
+		    SparseVector vec = (SparseVector) r.get(1);
 		    
+		    Vector features = Vectors.sparse(vec.size(), vec.indices(), vec.values());
 		    return new LabeledPoint(val, features);
 		}
 	    });
 	parsedData.cache();
 	
-	double stepSize = 0.00000001;
-	final LinearRegressionModel model =
-	    LinearRegressionWithSGD.train(JavaRDD.toRDD(parsedData), iterations, stepSize);
+	double stepSize = 1.0;
+	double regParam = 0.01;
+	final LassoModel model =
+	    LassoWithSGD.train(JavaRDD.toRDD(parsedData), iterations, stepSize, regParam);
 	
 	// Evaluate model on training examples and compute training error
 	JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
@@ -198,6 +209,6 @@ public class AgePredictSGDTrainer {
 	System.out.println("training Mean Squared Error = " + MSE);
 	
 	Map<String, String> manifestInfoEntries = new HashMap<String, String>();
-	return new AgePredictModel(languageCode, model, cvm.vocabulary(), manifestInfoEntries, factory);
+	return new AgePredictModel(languageCode, model, cvm.vocabulary(), wrapper);
     }
 }
