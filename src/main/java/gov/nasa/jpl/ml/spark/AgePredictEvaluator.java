@@ -33,10 +33,13 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaDoubleRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.ml.linalg.SparseVector;
+import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.sql.Dataset;
 
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.types.*;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.mllib.regression.LabeledPoint;
@@ -56,72 +59,16 @@ import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
 public class AgePredictEvaluator {
     
     public static void evaluate(SparkSession spark, File classifyModel, File linModel, File report, 
-				String dataIn) throws IOException {
+				List<Row> data) throws IOException {
 	
-	final AgeClassifyME classify = ((classifyModel == null) ? null :
-	    new AgeClassifyME(new AgeClassifyModel(classifyModel)));
 	final AgePredictModel model = AgePredictModel.readModel(linModel);
 	
-	JavaRDD<String> data = spark.sparkContext().textFile(dataIn, 8).toJavaRDD()
-	    .cache();
-	
-	final AgeClassifyContextGeneratorWrapper contextGen = model.getContext();
-	// Featurize all the data
-	JavaRDD<EventWrapper> samples = data.map(
-	    new Function<String, EventWrapper>() {
-		public EventWrapper call(String s) {
-		    try {
-			String category = s.split("\t", 2)[0]; 
-			String text = s.split("\t", 2)[1];
-			
-			//first tokenize the text
-			String tokens[] = contextGen.getTokenizer().tokenize(text);
-			//then extract features using all the feature generators
-			Collection<String> context = new ArrayList<String>();
-			
-			FeatureGenerator[] featureGenerators = contextGen.getFeatureGenerators();
-			for (FeatureGenerator featureGenerator : featureGenerators) {
-			    Collection<String> extracted = 
-				featureGenerator.extractFeatures(tokens);
-			    context.addAll(extracted);
-			}
-			
-			if (classify != null) {
-			    double prob[] = classify.getProbabilities(tokens);
-			    String predict = classify.getBestCategory(prob);
-			    
-			    for (int i = 0; i < tokens.length / 9; i++) {
-				context.add("cat=" + predict);
-			    }
-			}
-			
-			String features[] = context.toArray(new String[context.size()]); 
-			
-			if (features.length > 0) {
-			    //input can be both an age number or age category
-			    int age = Integer.valueOf(category);    
-			    return new EventWrapper(age, features);
-			} else {
-			    return null;
-			}
-		    } catch (Exception e) {
-			//sample is not in the correct format, ignore
-			return null;
-		    }
-		    
-		}
-	    }).cache();
-						 
-						 
-	JavaRDD<EventWrapper> validSamples = samples.filter(
-	    new Function<EventWrapper, Boolean>() {
-                @Override
-                public Boolean call(EventWrapper s) { return s != null; }
-	    }).cache();
-	
-	samples.unpersist();
+	StructType schema = new StructType(new StructField [] {
+                new StructField("value", DataTypes.IntegerType, false, Metadata.empty()),
+                new StructField("context", new ArrayType(DataTypes.StringType, true), false, Metadata.empty())
+            });
 
-	Dataset<Row> eventDF = spark.createDataFrame(validSamples, EventWrapper.class).cache();
+	Dataset<Row> eventDF = spark.createDataFrame(data, schema).cache();
 	
 	CountVectorizerModel cvm = new CountVectorizerModel(model.getVocabulary())
 	    .setInputCol("text")
@@ -167,7 +114,6 @@ public class AgePredictEvaluator {
 	    while (iterator.hasNext()) {
 		Tuple2<Double, Double> pair = iterator.next();
 		writer.write(pair._1() + "," + pair._2());
-		writer.flush();
 	    }
 	    writer.close();
 	}

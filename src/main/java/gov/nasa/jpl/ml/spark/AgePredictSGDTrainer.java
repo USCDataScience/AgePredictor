@@ -133,18 +133,23 @@ public class AgePredictSGDTrainer {
 		public Row call(String s) {
 		    String[] parts = s.split(",");
 		    
-		    if (parts[0] != "-1") {
-			Integer value = Integer.parseInt(parts[0]);
-			
-			String[] text = parts[2].split(" ");
-			//add in the category as another feature
-			List<String> tokens= new ArrayList<String>(Arrays.asList(text));
-			tokens.add("cat=" + parts[1]);
-						    
-			return RowFactory.create(value, tokens.toArray());
-		    } else {
+		    try {
+			if (parts[0] != "-1") {
+			    Integer value = Integer.parseInt(parts[0]);
+			        
+			    String[] text = parts[2].split(" ");
+			    //add in the category as another feature
+			    List<String> tokens= new ArrayList<String>(Arrays.asList(text));
+			    tokens.add("cat=" + parts[1]);
+			    
+			    return RowFactory.create(value, tokens.toArray());
+			} else {
+			    return null;
+			}
+		    } catch (Exception e) {
 			return null;
 		    }
+
 		}
 	    }).cache();
 	
@@ -185,7 +190,7 @@ public class AgePredictSGDTrainer {
 	    });
 	parsedData.cache();
 	
-	double stepSize = 1.0;
+	double stepSize = 0.01;
 	double regParam = 0.01;
 	final LassoModel model =
 	    LassoWithSGD.train(JavaRDD.toRDD(parsedData), iterations, stepSize, regParam);
@@ -206,7 +211,7 @@ public class AgePredictSGDTrainer {
 	       }
 	   }).rdd()).mean();
 	
-	System.out.println("training Mean Squared Error = " + MSE);
+	System.out.println("Training Mean Squared Error = " + MSE);
 	
 	Map<String, String> manifestInfoEntries = new HashMap<String, String>();
 	return new AgePredictModel(languageCode, model, cvm.vocabulary(), wrapper);

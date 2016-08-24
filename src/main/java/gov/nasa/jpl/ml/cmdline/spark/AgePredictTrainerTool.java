@@ -97,8 +97,8 @@ public class AgePredictTrainerTool extends BasicCmdLineTool {
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);
         }
 	
-	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(params.getFeatureGenerators(),
-	    params.getTokenizer());
+	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(params.getTokenizer(),
+	    params.getFeatureGenerators());
 	FeatureGenerator[] featureGenerators = wrapper.getFeatureGenerators();
 	Tokenizer tokenizer = wrapper.getTokenizer();
 

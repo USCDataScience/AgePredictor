@@ -51,7 +51,7 @@ public class AgeClassifyEventStream extends AbstractEventStream<AuthorAgeSample>
 
 		isVirgin = false;
 		
-		System.out.println(Arrays.toString(contextGenerator.getContext(sample.getText())));
+		//System.out.println(Arrays.toString(contextGenerator.getContext(sample.getText())));
 		return new Event(sample.getCategory(),
 				 contextGenerator.getContext(sample.getText()));
 	    }

@@ -62,7 +62,32 @@ public class AgeClassifySparkTrainer {
 
 	JavaRDD<String> data = sc.textFile(dataIn, 8).cache();
 	JavaRDD<EventWrapper> samples = data.map(new CreateEvents(wrapper)).cache();
-	    
+	
+	/*
+	JavaRDD<EventWrapper> samples = data.map( 
+	     new Function<String, EventWrapper>() {
+		 public EventWrapper call(String s) {
+		     String[] parts = s.split(",");
+		     
+		     try {
+			 if (parts[0] != "-1") {
+			     Integer value = Integer.parseInt(parts[0]);
+			     
+			     String[] text = parts[2].split(" ");
+			     return new EventWrapper(value, text);
+			 } else {
+			     String cat = parts[1];
+			     
+			     String[] text = parts[2].split(" ");
+			     return new EventWrapper(cat, text);
+			 }
+		     } catch(Exception e) {
+			 return null;
+		     }
+		 }
+	     });
+	*/
+
 	JavaRDD<EventWrapper> validSamples = samples.filter(
             new Function<EventWrapper, Boolean>() {
 		@Override

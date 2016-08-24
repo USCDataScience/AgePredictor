@@ -17,6 +17,19 @@
 
 package gov.nasa.jpl.ml.cmdline.spark.authorage;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Arrays;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import opennlp.tools.cmdline.CmdLineUtil;
+import opennlp.tools.cmdline.SystemInputStreamFactory;
+import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.ParagraphStream;
+import opennlp.tools.util.PlainTextByLineStream;
+
 import opennlp.tools.cmdline.ArgumentParser;
 import opennlp.tools.cmdline.ObjectStreamFactory;
 import opennlp.tools.cmdline.StreamFactoryRegistry;
@@ -26,12 +39,18 @@ import opennlp.tools.cmdline.TerminateToolException;
 import opennlp.tools.authorage.AuthorAgeSample;
 
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 
+import opennlp.tools.authorage.AgeClassifyModel;
+import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.util.featuregen.FeatureGenerator;
+
+import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import gov.nasa.jpl.ml.spark.authorage.AgeClassifyContextGeneratorWrapper;
 import gov.nasa.jpl.ml.cmdline.params.PredictEvalToolParams;
 import gov.nasa.jpl.ml.spark.authorage.AgePredictEvaluator;
 import gov.nasa.jpl.ml.cmdline.CLI;
-
-import java.io.IOException;
 
 /**
  * TODO: Documentation
@@ -72,17 +91,74 @@ public class AgePredictEvaluatorTool
 	     .builder()
 	     .appName("AgePredictEvaluator")
 	     .getOrCreate();
-
+	 
 	 params = ArgumentParser.parse(ArgumentParser.filter(args, this.paramsClass), this.paramsClass);
+	 ObjectStream<String> documentStream;
+	 List<Row> data = new ArrayList<Row>();
+
+	 AgePredictModel model = null;
+	 AgeClassifyME classify = null;
+	 try {    
+	     model = AgePredictModel.readModel(params.getModel());
+	     classify = new AgeClassifyME(new AgeClassifyModel(params.getClassifyModel()));
+	 } catch (IOException e) {
+	     e.printStackTrace();
+	     return;
+	 }
+
+	 AgeClassifyContextGeneratorWrapper contextGen = model.getContext();
 	 try {
-	     AgePredictEvaluator.evaluate(spark, params.getClassifyModel(), params.getModel(), params.getReport(), 
-					  params.getData());
+	     documentStream = new ParagraphStream(
+	         new PlainTextByLineStream(new FileInputStream(params.getData()), 
+		     SystemInputStreamFactory.encoding()));
+
+	     String document;
+	     FeatureGenerator[] featureGenerators = contextGen.getFeatureGenerators();
+	     while ((document = documentStream.read()) != null) {
+		 String label = document.split("\t", 2)[0]; 
+		 String text = document.split("\t", 2)[1];
+		  
+		 String[] tokens = contextGen.getTokenizer().tokenize(text);
+		  
+		 double prob[] = classify.getProbabilities(tokens);
+		 String category = classify.getBestCategory(prob);
+		  
+		 Collection<String> context = new ArrayList<String>();
+		  
+		 for (FeatureGenerator featureGenerator : featureGenerators) {
+		          Collection<String> extractedFeatures =
+			      featureGenerator.extractFeatures(tokens);
+			  context.addAll(extractedFeatures);
+		 }
+		  
+		 if (category != null) {
+		     for (int i = 0; i < tokens.length / 9; i++) {
+			 context.add("cat="+ category);
+		     }
+		 }
+		 if (context.size() > 0) {
+		     try {
+			 int age = Integer.valueOf(label);
+			 System.out.println("Row:" + age + "," +  Arrays.toString(context.toArray()));
+			  
+			 data.add(RowFactory.create(age, context.toArray()));
+		     } catch (Exception e) {
+			 //do nothing
+		     }
+		 }
+	     } 
+	 } catch (IOException e) {
+	     CmdLineUtil.handleStdinIoError(e);
+	 }
+	 
+	 try {
+	     AgePredictEvaluator.evaluate(spark, params.getClassifyModel(), params.getModel(), 
+					  params.getReport(), data);
 	 } catch (IOException e) {
 	     System.err.println("failed");
 	     throw new TerminateToolException(-1, "IO error while reading test data: "
 					      + e.getMessage(), e);
 	 }
-	 
 	 
      }
      

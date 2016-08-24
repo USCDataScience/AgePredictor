@@ -55,8 +55,8 @@ public class AgeClassifySparkEvaluator {
 	public Boolean call(Tuple2<String, String> sample) throws IOException {
 	    String category = sample._1();
 	    String text = sample._2();
-	    System.out.println("Sample: " + category + ", " + text);
 
+	    System.out.println("Sample: " + category + ", " + text);
 	    AgeClassifyME classifier = this.wrapper.getClassifier();
 	    
 	    String predicted = classifier.predict(text);
