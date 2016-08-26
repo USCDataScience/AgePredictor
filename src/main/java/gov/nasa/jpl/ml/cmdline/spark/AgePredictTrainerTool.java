@@ -89,6 +89,7 @@ public class AgePredictTrainerTool extends BasicCmdLineTool {
 	System.out.println("Feature Generators: " + params.getFeatureGenerators());
 	System.out.println("Tokenizer: " + params.getTokenizer());
 	
+	/*
 	try {
 	    AgePredictSGDTrainer.generateEvents(spark, params.getData(), params.getTokenizer(),
 					 params.getFeatureGenerators(), params.getEvents());
@@ -96,6 +97,7 @@ public class AgePredictTrainerTool extends BasicCmdLineTool {
             throw new TerminateToolException(-1,
 	        "IO error while reading training data or indexing data: " + e.getMessage(), e);
         }
+	*/
 	
 	AgeClassifyContextGeneratorWrapper wrapper = new AgeClassifyContextGeneratorWrapper(params.getTokenizer(),
 	    params.getFeatureGenerators());

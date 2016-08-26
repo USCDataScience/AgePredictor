@@ -44,6 +44,7 @@ import org.apache.spark.sql.types.*;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.ml.feature.CountVectorizerModel;
+import org.apache.spark.ml.feature.Normalizer;
 import org.apache.spark.mllib.regression.LassoModel;
 
 import opennlp.tools.authorage.AgeClassifyModel;
@@ -59,22 +60,83 @@ import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
 public class AgePredictEvaluator {
     
     public static void evaluate(SparkSession spark, File classifyModel, File linModel, File report, 
-				List<Row> data) throws IOException {
+				String dataIn) throws IOException {
 	
 	final AgePredictModel model = AgePredictModel.readModel(linModel);
+	final AgeClassifyModelWrapper wrapper = new AgeClassifyModelWrapper(classifyModel);
+	
+	JavaRDD<String> data = spark.sparkContext().textFile(dataIn,8).toJavaRDD().cache();
+	
+	final AgeClassifyContextGeneratorWrapper contextGen = model.getContext();
+	JavaRDD<Row> samples = data.map(
+	    new Function<String, Row>() {
+		public Row call(String s) throws IOException{
+		    String label = s.split("\t", 2)[0];
+		    String text = s.split("\t", 2)[1];
+		    
+		    String[] tokens = contextGen.getTokenizer().tokenize(text);
+		    
+		    AgeClassifyME classify = wrapper.getClassifier();
+		    
+		    double prob[] = classify.getProbabilities(tokens);
+		    String category = classify.getBestCategory(prob);
+		    
+		    Collection<String> context = new ArrayList<String>();
+		    
+		    FeatureGenerator[] featureGenerators = contextGen.getFeatureGenerators();
+		    for (FeatureGenerator featureGenerator : featureGenerators) {
+			Collection<String> extractedFeatures =
+			    featureGenerator.extractFeatures(tokens);
+			context.addAll(extractedFeatures);
+		    }
+		    
+		    if (category != null) {
+			for (int i = 0; i < tokens.length / 9; i++) {
+			    context.add("cat="+ category);
+			}
+		    }
+		    if (context.size() > 0) {
+			try {
+			    int age = Integer.valueOf(label);
+			    System.out.println("Row:" + age + "," +  Arrays.toString(context.toArray()));
+			    
+			    return RowFactory.create(age, context.toArray());
+			} catch (Exception e) {
+			    return null;
+			}
+		    } else {
+			return null;
+		    }
+		}
+	    });
+	    
+	JavaRDD<Row> validSamples = samples.filter(
+	    new Function<Row, Boolean>() {
+                @Override
+                public Boolean call(Row s) { return s != null; }
+	    }).cache();
+	
+	samples.unpersist();
 	
 	StructType schema = new StructType(new StructField [] {
                 new StructField("value", DataTypes.IntegerType, false, Metadata.empty()),
                 new StructField("context", new ArrayType(DataTypes.StringType, true), false, Metadata.empty())
             });
 
-	Dataset<Row> eventDF = spark.createDataFrame(data, schema).cache();
+	Dataset<Row> df = spark.createDataFrame(validSamples, schema).cache();
 	
 	CountVectorizerModel cvm = new CountVectorizerModel(model.getVocabulary())
 	    .setInputCol("text")
 	    .setOutputCol("feature");
 	
-	JavaRDD<Row> events = cvm.transform(eventDF).select("value", "feature").javaRDD()
+	Normalizer normalizer = new Normalizer()
+            .setInputCol("feature")
+            .setOutputCol("normFeature")
+            .setP(1.0);
+	
+        Dataset<Row> eventDF= cvm.transform(df).select("value", "feature");
+	
+	JavaRDD<Row> events = normalizer.transform(eventDF).select("value", "normFeature").javaRDD()
 	    .cache();
 	eventDF.unpersist();
 	

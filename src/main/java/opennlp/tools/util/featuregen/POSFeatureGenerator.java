@@ -59,15 +59,18 @@ public class POSFeatureGenerator implements FeatureGenerator {
 		if (token == "<SENTENCE>") {
 		    String tags[] = tagger.tag(sentence.toArray(new String[sentence.size()]));
 		    
-		    for (String tag : tags) {
-			pos.add("pos=" + tag);
+		    for (int i = 0; i < tags.length; i++) {
+			pos.add("pos=" + tags[i]);
+			if (i < tags.length - 1) {
+			    pos.add("posng=" + tags[i] + ":" + tags[i + 1]);
+			}
 		    }
 		    sentence.clear();
 		}
 		else {
 		    sentence.add(token);
 		}
-	    }
+	    }   
 	}
 	catch (IOException e) {
 	    e.printStackTrace();

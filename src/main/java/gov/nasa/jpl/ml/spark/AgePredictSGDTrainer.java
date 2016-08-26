@@ -49,7 +49,7 @@ import org.apache.spark.mllib.regression.LabeledPoint;
 
 import org.apache.spark.ml.feature.CountVectorizer;
 import org.apache.spark.ml.feature.CountVectorizerModel;
-
+import org.apache.spark.ml.feature.Normalizer;
 
 import org.apache.commons.io.FileUtils;
 
@@ -131,8 +131,13 @@ public class AgePredictSGDTrainer {
 	JavaRDD<Row> samples = data.map(
 	    new Function<String, Row>() {
 		public Row call(String s) {
+		    if (s == null) {
+			return null;
+		    }
 		    String[] parts = s.split(",");
-		    
+		    if (parts.length != 3) {
+			return null;
+		    }
 		    try {
 			if (parts[0] != "-1") {
 			    Integer value = Integer.parseInt(parts[0]);
@@ -140,8 +145,11 @@ public class AgePredictSGDTrainer {
 			    String[] text = parts[2].split(" ");
 			    //add in the category as another feature
 			    List<String> tokens= new ArrayList<String>(Arrays.asList(text));
-			    tokens.add("cat=" + parts[1]);
+			    for (int i = 0; i < text.length / 9; i++) {
+				tokens.add("cat=" + parts[1]);
+			    }
 			    
+			    //System.out.println("Event:" + value + "," + Arrays.toString(tokens.toArray()));
 			    return RowFactory.create(value, tokens.toArray());
 			} else {
 			    return null;
@@ -166,15 +174,22 @@ public class AgePredictSGDTrainer {
 		new StructField("context", new ArrayType(DataTypes.StringType, true), false, Metadata.empty())
             });
 
-	Dataset<Row> eventDF = spark.createDataFrame(validSamples, schema).cache();
+	Dataset<Row> df = spark.createDataFrame(validSamples, schema).cache();
 	
 	CountVectorizerModel cvm = new CountVectorizer()
 	    .setInputCol("context")
 	    .setOutputCol("feature")
 	    .setMinDF(cutoff)
-	    .fit(eventDF);
+	    .fit(df);
 	
-	JavaRDD<Row> events = cvm.transform(eventDF).select("value", "feature").javaRDD()
+	Normalizer normalizer = new Normalizer()
+	    .setInputCol("feature")
+	    .setOutputCol("normFeature")
+	    .setP(1.0);
+	
+	Dataset<Row> eventDF = cvm.transform(df).select("value", "feature");
+	
+	JavaRDD<Row> events = normalizer.transform(eventDF).select("value", "normFeature").javaRDD()
 	    .cache();
 	eventDF.unpersist();
 	

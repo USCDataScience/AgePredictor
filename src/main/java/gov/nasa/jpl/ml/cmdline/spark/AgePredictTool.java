@@ -38,6 +38,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.ml.feature.CountVectorizerModel;
+import org.apache.spark.ml.feature.Normalizer;
 import org.apache.spark.mllib.regression.LassoModel;
 
 import opennlp.tools.authorage.AgeClassifyModel;
@@ -149,12 +150,19 @@ public class AgePredictTool extends BasicCmdLineTool {
 	    .setInputCol("text")
 	    .setOutputCol("feature");
 	
-	JavaRDD<Row> events = cvm.transform(df).javaRDD();
+	Dataset<Row> eventDF = cvm.transform(df);
+	
+	Normalizer normalizer = new Normalizer()
+            .setInputCol("feature")
+            .setOutputCol("normFeature")
+            .setP(1.0);
 
+        JavaRDD<Row> normEventDF= normalizer.transform(eventDF).javaRDD();
+	
 	final LassoModel linModel = model.getModel();
-	events.foreach( new VoidFunction<Row>() {
+	normEventDF.foreach( new VoidFunction<Row>() {
 		public void call(Row event) {
-		    double prediction = linModel.predict((Vector) event.getAs("feature"));
+		    double prediction = linModel.predict((Vector) event.getAs("normFeature"));
 		    System.out.println((String) event.getAs("document"));
 		    System.out.println("Prediction: "+ prediction);
 		}
