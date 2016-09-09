@@ -95,24 +95,21 @@ public final class AgeClassifyEvaluatorTool extends
 	    listeners.add(new AgeClassifyEvaluationErrorListener());
 	}
 	
-	/* TODO: Add support for generatinr a detailed statistics report
-
-	DoccatFineGrainedReportListener reportListener = null;
+	AgeClassifyFineGrainedReportListener reportListener = null;
 	File reportFile = params.getReportOutputFile();
 	OutputStream reportOutputStream = null;
 	if (reportFile != null) {
 	    CmdLineUtil.checkOutputFile("Report Output File", reportFile);
 	    try {
 		reportOutputStream = new FileOutputStream(reportFile);
-		reportListener = new DoccatFineGrainedReportListener(reportOutputStream);
+		reportListener = new AgeClassifyFineGrainedReportListener(reportOutputStream);
 		listeners.add(reportListener);
 	    } catch (FileNotFoundException e) {
 		throw new TerminateToolException(-1,
-            "IO error while creating Doccat fine-grained report file: "
+            "IO error while creating AgeClassify fine-grained report file: "
 						 + e.getMessage());
 	    }
 	}
-	*/
 	
 	AgeClassifyEvaluator evaluator = new AgeClassifyEvaluator(
 	    new AgeClassifyME(model),
@@ -158,7 +155,6 @@ public final class AgeClassifyEvaluatorTool extends
 
 	System.out.println(evaluator);
 	
-	/*
 	if (reportListener != null) {
 	    System.out.println("Writing fine-grained report to "
 			       + params.getReportOutputFile().getAbsolutePath());
@@ -171,7 +167,7 @@ public final class AgeClassifyEvaluatorTool extends
 		// nothing to do
 	    }
 	}
-	*/
+	
     }
     
 }

@@ -25,42 +25,59 @@ import org.apache.commons.io.FileUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 
 import opennlp.tools.util.InvalidFormatException;
 
 /**
  * Generates a feature for each word in a document.
  */
-public class BagOfWordsFeatureGenerator implements FeatureGenerator {
+public class LIWCFeatureGenerator implements FeatureGenerator {
     
-    public static final BagOfWordsFeatureGenerator INSTANCE = new BagOfWordsFeatureGenerator();
+    public static final LIWCFeatureGenerator INSTANCE = new LIWCFeatureGenerator();
 
-    private static List<String> stopwords = new ArrayList<String>();
-   
+    private static Map<String, List<String>> liwc = new HashMap<>();
+    
     static {
-	try {
-	    stopwords = FileUtils.readLines(new File("props/stopwords.txt"), "utf-8");
-	} catch (IOException e) {
-	    stopwords = new ArrayList<String>();
+	File[] files = new File("props/wordlists/").listFiles();
+
+	for (File file: files) {
+	    String filename = file.getName();
+	    filename = filename.substring(0, filename.lastIndexOf('.'));
+	    
+	    try {
+		List<String> list = FileUtils.readLines(file, "utf-8");
+		liwc.put(filename, list);
+	    } catch (IOException e) {
+		//Just ignore?
+	    } catch (Throwable t) {
+		System.out.println(t);
+	    }
 	}
     }
+	
     
-    public BagOfWordsFeatureGenerator() {
+    public LIWCFeatureGenerator() {
     }
     
     @Override
     public Collection<String> extractFeatures(String[] text) {
 	
-	Collection<String> bagOfWords = new ArrayList<String>();
-
-	for (String word : text) {
-	    if (!stopwords.contains(word)) {
-		bagOfWords.add("bow=" + word);
+	Collection<String> liwc_features = new ArrayList<String>();
+	
+	for (String word: text) {
+	    Iterator it = liwc.entrySet().iterator();
+	    while (it.hasNext()) {
+		Map.Entry<String, List<String>> pair = (Map.Entry)it.next();
+		if (pair.getValue().contains(word)) {
+		    liwc_features.add("liwc=" + pair.getKey());
+		}
 	    }
 	}
-
-	return bagOfWords;
+	
+	return liwc_features;
     }
 
 }

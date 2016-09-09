@@ -18,7 +18,8 @@ package opennlp.tools.authorage;
 
 import java.io.IOException;
 import java.util.Arrays;
-
+import java.util.Set;
+import java.util.HashSet;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
@@ -46,12 +47,21 @@ public class AuthorAgeSampleStream extends FilterObjectStream<String, AuthorAgeS
 	String sampleString = samples.read();
 	
 	while (sampleString != null) {
-	    String category = sampleString.split("\t", 2)[0];
+	    String category;
+	    String text;
 	    
-	    String text = sampleString.split("\t", 2)[1];
+	    try {
+		category = sampleString.split("\t", 2)[0];
+		text = sampleString.split("\t", 2)[1];
+	    } catch(Exception e) {
+		sampleString = samples.read();
+                continue;
+	    }
+
 	    String tokens[] = this.tokenizer.tokenize(text);
 	    
 	    AuthorAgeSample sample;
+		    
 	    if (tokens.length > 0) {
 		//input can be both an age number or age category
 		try {
@@ -59,6 +69,20 @@ public class AuthorAgeSampleStream extends FilterObjectStream<String, AuthorAgeS
 		    sample = new AuthorAgeSample(age, tokens);
 		} catch (NumberFormatException e) {
 		    //try category as a string
+		    
+		    //possible categories
+		    Set<String> categories = new HashSet<String>() {{
+			    add("xx-18");
+			    add("25-34");
+			    add("35-49");
+			    add("50-64");
+			    add("65-xx");
+			}};
+		    // Make sure it is a valid category; else read another sample
+		    if (!categories.contains(category)) {
+			sampleString = samples.read();
+			continue;
+		    }
 		    sample = new AuthorAgeSample(category, tokens); 
 		} catch (Exception e) {
 		    e.printStackTrace();

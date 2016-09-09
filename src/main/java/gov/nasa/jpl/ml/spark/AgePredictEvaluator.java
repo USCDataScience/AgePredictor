@@ -63,7 +63,8 @@ public class AgePredictEvaluator {
 				String dataIn) throws IOException {
 	
 	final AgePredictModel model = AgePredictModel.readModel(linModel);
-	final AgeClassifyModelWrapper wrapper = new AgeClassifyModelWrapper(classifyModel);
+	final AgeClassifyModelWrapper wrapper = (classifyModel == null) ?
+	    null : new AgeClassifyModelWrapper(classifyModel);
 	
 	JavaRDD<String> data = spark.sparkContext().textFile(dataIn,8).toJavaRDD().cache();
 	
@@ -76,11 +77,14 @@ public class AgePredictEvaluator {
 		    
 		    String[] tokens = contextGen.getTokenizer().tokenize(text);
 		    
-		    AgeClassifyME classify = wrapper.getClassifier();
+		    String category = null;
+		    if (wrapper != null) {
+			AgeClassifyME classify = wrapper.getClassifier();
 		    
-		    double prob[] = classify.getProbabilities(tokens);
-		    String category = classify.getBestCategory(prob);
-		    
+			double prob[] = classify.getProbabilities(tokens);
+			category = classify.getBestCategory(prob);
+		    }
+
 		    Collection<String> context = new ArrayList<String>();
 		    
 		    FeatureGenerator[] featureGenerators = contextGen.getFeatureGenerators();
@@ -98,7 +102,7 @@ public class AgePredictEvaluator {
 		    if (context.size() > 0) {
 			try {
 			    int age = Integer.valueOf(label);
-			    System.out.println("Row:" + age + "," +  Arrays.toString(context.toArray()));
+			    //System.out.println("Row:" + age + "," +  Arrays.toString(context.toArray()));
 			    
 			    return RowFactory.create(age, context.toArray());
 			} catch (Exception e) {
@@ -126,7 +130,7 @@ public class AgePredictEvaluator {
 	Dataset<Row> df = spark.createDataFrame(validSamples, schema).cache();
 	
 	CountVectorizerModel cvm = new CountVectorizerModel(model.getVocabulary())
-	    .setInputCol("text")
+	    .setInputCol("context")
 	    .setOutputCol("feature");
 	
 	Normalizer normalizer = new Normalizer()
@@ -144,8 +148,9 @@ public class AgePredictEvaluator {
 	    new Function<Row, LabeledPoint>() {
 		public LabeledPoint call(Row r) {
 		    Integer val = r.getInt(0);
-		    Vector features = (Vector)r.get(1);
+		    SparseVector vec = (SparseVector)r.get(1);
 		    
+		    Vector features = Vectors.sparse(vec.size(), vec.indices(), vec.values());
 		    return new LabeledPoint(val, features);
 		}
 	    });
@@ -175,12 +180,12 @@ public class AgePredictEvaluator {
 	    FileWriter writer = new FileWriter(report); 
 	    while (iterator.hasNext()) {
 		Tuple2<Double, Double> pair = iterator.next();
-		writer.write(pair._1() + "," + pair._2());
+		writer.write(pair._1() + "," + pair._2() + "\n");
 	    }
 	    writer.close();
 	}
 
-	System.out.println("Training Mean Squared Error = " + MSE);
+	System.out.println("Mean Squared Error = " + MSE);
     }
 
 }
