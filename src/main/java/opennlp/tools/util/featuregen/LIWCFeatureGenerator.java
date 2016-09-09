@@ -52,8 +52,6 @@ public class LIWCFeatureGenerator implements FeatureGenerator {
 		liwc.put(filename, list);
 	    } catch (IOException e) {
 		//Just ignore?
-	    } catch (Throwable t) {
-		System.out.println(t);
 	    }
 	}
     }
