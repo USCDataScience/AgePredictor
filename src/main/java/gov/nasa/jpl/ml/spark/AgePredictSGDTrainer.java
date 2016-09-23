@@ -8,7 +8,7 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ 1;95;0c* Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -51,6 +51,9 @@ import org.apache.spark.ml.feature.CountVectorizer;
 import org.apache.spark.ml.feature.CountVectorizerModel;
 import org.apache.spark.ml.feature.Normalizer;
 
+import org.apache.spark.mllib.linalg.Matrix;
+import org.apache.spark.mllib.stat.Statistics;
+
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -64,6 +67,12 @@ public class AgePredictSGDTrainer {
     public static final String ITERATIONS_PARAM = "Iterations";
     public static final int ITERATIONS_DEFAULT = 100;
 
+    public static final String STEPSIZE_PARAM = "StepSize";
+    public static final double STEPSIZE_DEFAULT = 1.0;
+    
+    public static final String REG_PARAM = "Regularization";
+    public static final double REG_DEFAULT = 0.1;
+    
     public static void generateEvents(SparkSession spark, String dataIn, 
 				      String tokenizer, String featureGenerators,
 				      String outDir) throws IOException {
@@ -115,7 +124,27 @@ public class AgePredictSGDTrainer {
 	else
 	    return ITERATIONS_DEFAULT;
     }
+    
+    private static double getStepSize(Map<String, String> params) {
+	
+	String stepString = params.get(STEPSIZE_PARAM);
 
+	if (stepString != null)
+	    return Double.parseDouble(stepString);
+	else
+	    return STEPSIZE_DEFAULT;
+    }
+    
+    private static double getReg(Map<String, String> params) {
+	
+	String regString = params.get(REG_PARAM);
+
+	if (regString != null)
+	    return Double.parseDouble(regString);
+	else
+	    return REG_DEFAULT;
+    }
+    
     public static AgePredictModel createModel(String languageCode, SparkSession spark, 
 					      String eventDir, AgeClassifyContextGeneratorWrapper wrapper,
 					      TrainingParameters trainParams) throws IOException {
@@ -125,7 +154,7 @@ public class AgePredictSGDTrainer {
 	int cutoff = getCutoff(params);
 	int iterations = getIterations(params);
 	
-	JavaRDD<String> data = spark.sparkContext().textFile(eventDir, 8).toJavaRDD()
+	JavaRDD<String> data = spark.sparkContext().textFile(eventDir, 24).toJavaRDD()
 	    .cache();
 	
 	JavaRDD<Row> samples = data.map(
@@ -145,9 +174,10 @@ public class AgePredictSGDTrainer {
 			    String[] text = parts[2].split(" ");
 			    //add in the category as another feature
 			    List<String> tokens= new ArrayList<String>(Arrays.asList(text));
-			    for (int i = 0; i < text.length / 9; i++) {
+			    
+			    for (int i = 0; i < text.length / 18; i++) {
 				tokens.add("cat=" + parts[1]);
-			    }
+			    }			    
 			    
 			    //System.out.println("Event:" + value + "," + Arrays.toString(tokens.toArray()));
 			    return RowFactory.create(value, tokens.toArray());
@@ -187,11 +217,14 @@ public class AgePredictSGDTrainer {
 	    .setOutputCol("normFeature")
 	    .setP(1.0);
 	
-	Dataset<Row> eventDF = cvm.transform(df).select("value", "feature");
-	
-	JavaRDD<Row> events = normalizer.transform(eventDF).select("value", "normFeature").javaRDD()
-	    .cache();
+	Dataset<Row> eventDF = cvm.transform(df).select("value", "feature");			
+	//System.out.println("Vocab: " + cvm.vocabulary().length + "," + Arrays.toString(cvm.vocabulary()));
+	Dataset<Row> normDF = normalizer.transform(eventDF).select("value", "normFeature");	
+
+	JavaRDD<Row> events = normDF.javaRDD().cache();
+ 
 	eventDF.unpersist();
+	normDF.unpersist();
 	
 	JavaRDD<LabeledPoint> parsedData = events.map(
 	    new Function<Row, LabeledPoint>() {
@@ -202,32 +235,51 @@ public class AgePredictSGDTrainer {
 		    Vector features = Vectors.sparse(vec.size(), vec.indices(), vec.values());
 		    return new LabeledPoint(val, features);
 		}
-	    });
-	parsedData.cache();
+	    }).cache();
 	
-	double stepSize = 0.01;
-	double regParam = 0.01;
-	final LassoModel model =
-	    LassoWithSGD.train(JavaRDD.toRDD(parsedData), iterations, stepSize, regParam);
+	double stepSize = getStepSize(params);
+	double regParam = getReg(params);
 	
+	LassoWithSGD algorithm = (LassoWithSGD) new LassoWithSGD().setIntercept(true);
+	
+	algorithm.optimizer()
+	    .setNumIterations(iterations)
+	    .setStepSize(stepSize)
+	    .setRegParam(regParam);
+	
+	final LassoModel model = algorithm.run(JavaRDD.toRDD(parsedData));
+
+	System.out.println("Coefficients: " + Arrays.toString(model.weights().toArray()));
+	System.out.println("Intercept: " + model.intercept());
+ 
 	// Evaluate model on training examples and compute training error
 	JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
 	    new Function<LabeledPoint, Tuple2<Double, Double>>() {
 		public Tuple2<Double, Double> call(LabeledPoint point) {
 		    double prediction = model.predict(point.features());
+		    System.out.println(prediction + "," + point.label()); 
 		    return new Tuple2<>(prediction, point.label());
 		}
 	    }).cache();
-	
-	double MSE = new JavaDoubleRDD(valuesAndPreds.map(
+       
+	double MAE = new JavaDoubleRDD(valuesAndPreds.map(
 	   new Function<Tuple2<Double, Double>, Object>() {
 	       public Object call(Tuple2<Double, Double> pair) {
-		   return Math.pow(pair._1() - pair._2(), 2.0);
+		   return Math.abs(pair._1() - pair._2());
 	       }
 	   }).rdd()).mean();
 	
-	System.out.println("Training Mean Squared Error = " + MSE);
+	JavaRDD<Vector> vectors = valuesAndPreds.map(
+	    new Function<Tuple2<Double, Double>, Vector>() {
+		public Vector call(Tuple2<Double, Double> pair) {
+		    return Vectors.dense(pair._1(), pair._2());
+		}
+	    });
+	Matrix correlMatrix = Statistics.corr(vectors.rdd(), "pearson");
 	
+	System.out.println("Training Mean Absolute Error: " + MAE);
+	System.out.println("Correlation:\n" + correlMatrix.toString());
+
 	Map<String, String> manifestInfoEntries = new HashMap<String, String>();
 	return new AgePredictModel(languageCode, model, cvm.vocabulary(), wrapper);
     }

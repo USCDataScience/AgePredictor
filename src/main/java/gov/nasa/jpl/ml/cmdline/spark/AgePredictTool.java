@@ -128,7 +128,7 @@ public class AgePredictTool extends BasicCmdLineTool {
 		}
 		
 		if (category != null) {
-		    for (int i = 0; i < tokens.length / 9; i++) {
+		    for (int i = 0; i < tokens.length / 18; i++) {
 			context.add("cat="+ category);
 		    }
 		}

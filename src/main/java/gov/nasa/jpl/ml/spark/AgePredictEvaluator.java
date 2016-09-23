@@ -95,10 +95,11 @@ public class AgePredictEvaluator {
 		    }
 		    
 		    if (category != null) {
-			for (int i = 0; i < tokens.length / 9; i++) {
+			for (int i = 0; i < tokens.length / 18; i++) {
 			    context.add("cat="+ category);
 			}
 		    }
+		    
 		    if (context.size() > 0) {
 			try {
 			    int age = Integer.valueOf(label);
@@ -129,18 +130,19 @@ public class AgePredictEvaluator {
 
 	Dataset<Row> df = spark.createDataFrame(validSamples, schema).cache();
 	
+	System.out.println("Vocab: " + model.getVocabulary());
 	CountVectorizerModel cvm = new CountVectorizerModel(model.getVocabulary())
 	    .setInputCol("context")
 	    .setOutputCol("feature");
 	
 	Normalizer normalizer = new Normalizer()
             .setInputCol("feature")
-            .setOutputCol("normFeature")
+            .setOutputCol("norm")
             .setP(1.0);
 	
         Dataset<Row> eventDF= cvm.transform(df).select("value", "feature");
 	
-	JavaRDD<Row> events = normalizer.transform(eventDF).select("value", "normFeature").javaRDD()
+	JavaRDD<Row> events = normalizer.transform(eventDF).select("value", "norm").javaRDD()
 	    .cache();
 	eventDF.unpersist();
 	
@@ -166,10 +168,10 @@ public class AgePredictEvaluator {
 		}
 	    }).cache();
 	
-	double MSE = new JavaDoubleRDD(valuesAndPreds.map(
+	double MAE = new JavaDoubleRDD(valuesAndPreds.map(
 	   new Function<Tuple2<Double, Double>, Object>() {
 	       public Object call(Tuple2<Double, Double> pair) {
-		   return Math.pow(pair._1() - pair._2(), 2.0);
+		   return Math.abs(pair._1() - pair._2());
 	       }
 	   }).rdd()).mean();
 	
@@ -185,7 +187,7 @@ public class AgePredictEvaluator {
 	    writer.close();
 	}
 
-	System.out.println("Mean Squared Error = " + MSE);
+	System.out.println("Mean Absolute Error: " + MAE);
     }
 
 }

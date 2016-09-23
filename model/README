@@ -1,5 +1,11 @@
 Models:
 ----------------------------------------
-1)blogs-unigram: Model trained on the Blog Corpus with unigrams as features. Accuracy: ~50.1%
+1)classify-unigram: MaxEnt Model trained on the combined corpera with unigrams as features. Accuracy: ~50.1%
 
-2)blogs-bigrams: Model trained on the Blog Corpus with unigrams and bigrams as features. Accuracy: ~51.2%
+2)classify-bigrams: MaxEnt Model trained on the combined corpera with unigrams and bigrams as features. Accuracy: ~51.2%
+
+3)regression-unigram.bin: Regression Model trained on corpera with unigrams.
+
+4)regression-global.bin: Regression Model trained on corpera with unigrams, bigrams, and stylistic features. 
+
+5)regression-global-2.bin: Regression Model trained on corpera with all features, without the age category added as a feature.
