@@ -17,10 +17,13 @@
 
 package gov.nasa.jpl.ml.cmdline.authorage;
 
-import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
+import gov.nasa.jpl.ml.cmdline.CLI;
+import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.PerformanceMonitor;
@@ -28,13 +31,6 @@ import opennlp.tools.cmdline.SystemInputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.ParagraphStream;
 import opennlp.tools.util.PlainTextByLineStream;
-import opennlp.tools.util.InvalidFormatException;
-
-import opennlp.tools.authorage.AgeClassifyME;
-import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.authorage.AuthorAgeSample;
-
-import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation

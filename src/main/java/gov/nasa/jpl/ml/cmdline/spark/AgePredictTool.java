@@ -17,44 +17,39 @@
 
 package gov.nasa.jpl.ml.cmdline.spark.authorage;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.ml.feature.CountVectorizerModel;
+import org.apache.spark.ml.feature.Normalizer;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.regression.LassoModel;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.ArrayType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+
+import gov.nasa.jpl.ml.cmdline.CLI;
+import gov.nasa.jpl.ml.spark.AgePredictModel;
+import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.SystemInputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.ParagraphStream;
 import opennlp.tools.util.PlainTextByLineStream;
-import opennlp.tools.util.InvalidFormatException;
-
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.mllib.linalg.Vector;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.types.*;
-import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
-import org.apache.spark.ml.feature.CountVectorizerModel;
-import org.apache.spark.ml.feature.Normalizer;
-import org.apache.spark.mllib.regression.LassoModel;
-
-import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.util.featuregen.FeatureGenerator;
-
-import java.io.IOException;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import gov.nasa.jpl.ml.spark.authorage.AgePredictSGDTrainer;
-import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
-import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation

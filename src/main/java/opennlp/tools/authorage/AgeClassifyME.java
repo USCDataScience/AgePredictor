@@ -18,25 +18,21 @@
 package opennlp.tools.authorage;
 
 import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import opennlp.tools.ml.AgeClassifyTrainerFactory;
+import opennlp.tools.ml.AgeClassifyTrainerFactory.TrainerType;
 import opennlp.tools.ml.EventTrainer;
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.ml.model.MaxentModel;
-import opennlp.tools.util.TrainingParameters;
-import opennlp.tools.util.ObjectStream;
 import opennlp.tools.tokenize.Tokenizer;
-
-import opennlp.tools.ml.AgeClassifyTrainerFactory;
-import opennlp.tools.ml.AgeClassifyTrainerFactory.TrainerType;
+import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.TrainingParameters;
 
 /**
  * TODO: Documentation

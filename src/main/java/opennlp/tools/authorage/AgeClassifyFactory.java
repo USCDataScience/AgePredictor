@@ -17,21 +17,13 @@
 
 package opennlp.tools.authorage;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.lang.reflect.Field;
-
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.BaseToolFactory;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.ext.ExtensionLoader;
-
-import opennlp.tools.util.featuregen.FeatureGenerator;
 import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
-import opennlp.tools.tokenize.StemmerTokenizer;
+import opennlp.tools.util.featuregen.FeatureGenerator;
 
 
 /**

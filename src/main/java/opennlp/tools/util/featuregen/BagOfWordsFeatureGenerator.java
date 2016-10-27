@@ -19,15 +19,11 @@ package opennlp.tools.util.featuregen;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.List;
 
-import opennlp.tools.util.InvalidFormatException;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Generates a feature for each word in a document.

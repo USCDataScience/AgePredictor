@@ -19,42 +19,39 @@ package gov.nasa.jpl.ml.spark.authorage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
-import scala.Tuple2;
-
-import opennlp.tools.util.TrainingParameters;
-
-import org.apache.spark.sql.SparkSession;
+import org.apache.commons.io.FileUtils;
 import org.apache.spark.api.java.JavaDoubleRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.ml.linalg.SparseVector;
-import org.apache.spark.mllib.linalg.Vectors;
-import org.apache.spark.mllib.linalg.Vector;
-
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
-import org.apache.spark.sql.types.*;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.mllib.regression.LassoModel;
-import org.apache.spark.mllib.regression.LassoWithSGD;
-import org.apache.spark.mllib.regression.LabeledPoint;
-
 import org.apache.spark.ml.feature.CountVectorizer;
 import org.apache.spark.ml.feature.CountVectorizerModel;
 import org.apache.spark.ml.feature.Normalizer;
-
+import org.apache.spark.ml.linalg.SparseVector;
 import org.apache.spark.mllib.linalg.Matrix;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.linalg.Vectors;
+import org.apache.spark.mllib.regression.LabeledPoint;
+import org.apache.spark.mllib.regression.LassoModel;
+import org.apache.spark.mllib.regression.LassoWithSGD;
 import org.apache.spark.mllib.stat.Statistics;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.ArrayType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 
-import org.apache.commons.io.FileUtils;
+import opennlp.tools.util.TrainingParameters;
+import scala.Tuple2;
 
 /**
  * TODO: Documentation

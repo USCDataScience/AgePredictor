@@ -19,19 +19,17 @@ package gov.nasa.jpl.ml.cmdline.spark.authorage;
 
 import java.io.IOException;
 
+import org.apache.spark.sql.SparkSession;
+
+import gov.nasa.jpl.ml.cmdline.CLI;
+import gov.nasa.jpl.ml.cmdline.params.PredictEvalToolParams;
+import gov.nasa.jpl.ml.spark.AgePredictEvaluator;
+import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.cmdline.AbstractEvaluatorTool;
 import opennlp.tools.cmdline.ArgumentParser;
 import opennlp.tools.cmdline.ObjectStreamFactory;
 import opennlp.tools.cmdline.StreamFactoryRegistry;
-import opennlp.tools.cmdline.params.EvaluatorParams;
-import opennlp.tools.cmdline.AbstractEvaluatorTool;
 import opennlp.tools.cmdline.TerminateToolException;
-import opennlp.tools.authorage.AuthorAgeSample;
-
-import org.apache.spark.sql.SparkSession;
-
-import gov.nasa.jpl.ml.cmdline.params.PredictEvalToolParams;
-import gov.nasa.jpl.ml.spark.authorage.AgePredictEvaluator;
-import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation

@@ -17,23 +17,20 @@
 
 package gov.nasa.jpl.ml.spark.authorage;
 
-import scala.Tuple2;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 
-import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AgeClassifyME;
-
-import java.io.IOException;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import scala.Tuple2;
 
 /**
 * TODO: Documentation

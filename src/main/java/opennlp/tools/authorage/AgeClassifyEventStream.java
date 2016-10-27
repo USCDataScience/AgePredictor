@@ -18,7 +18,6 @@
 package opennlp.tools.authorage;
 
 import java.util.Iterator;
-import java.util.Arrays;
 
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.util.AbstractEventStream;

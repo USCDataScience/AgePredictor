@@ -17,25 +17,21 @@
 
 package gov.nasa.jpl.ml.authorage.example;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
-
-import opennlp.tools.util.TrainingParameters;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.PlainTextByLineStream;
 
 import opennlp.tools.authorage.AgeClassifyFactory;
 import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.authorage.AuthorAgeSampleStream;
+import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.PlainTextByLineStream;
+import opennlp.tools.util.TrainingParameters;
 
 //import opennlp.tools.ml.naivebayes.NaiveBayesTrainer;
 

@@ -17,12 +17,12 @@
 
 package gov.nasa.jpl.ml.spark.authorage;
 
-import java.io.Serializable;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 
-import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.authorage.AgeClassifyModel;
     
 public class AgeClassifyModelWrapper implements Serializable {
     private File model;

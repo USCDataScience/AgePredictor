@@ -17,9 +17,8 @@
 package opennlp.tools.authorage;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;

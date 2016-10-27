@@ -18,7 +18,6 @@
 package opennlp.tools.util.featuregen;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Interface for generating features for document categorization.

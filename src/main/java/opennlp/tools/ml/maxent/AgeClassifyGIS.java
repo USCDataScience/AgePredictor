@@ -19,19 +19,16 @@ package opennlp.tools.ml.maxent;
 
 import java.io.IOException;
 
-import opennlp.tools.ml.model.Event;
-import opennlp.tools.ml.model.Prior;
-import opennlp.tools.ml.model.UniformPrior;
-
+import opennlp.tools.ml.AbstractEventTrainer;
+import opennlp.tools.ml.model.ChiSquaredDataIndexer;
 import opennlp.tools.ml.model.DataIndexer;
-import opennlp.tools.ml.model.HashSumEventStream;
+import opennlp.tools.ml.model.Event;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.ml.model.OnePassDataIndexer;
+import opennlp.tools.ml.model.Prior;
 import opennlp.tools.ml.model.TwoPassDataIndexer;
-import opennlp.tools.ml.model.ChiSquaredDataIndexer;
+import opennlp.tools.ml.model.UniformPrior;
 import opennlp.tools.util.ObjectStream;
-
-import opennlp.tools.ml.AbstractEventTrainer;
 
 public class AgeClassifyGIS extends AbstractEventTrainer {
     

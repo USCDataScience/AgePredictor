@@ -16,7 +16,6 @@
  */
 package opennlp.tools.authorage;
 
-import opennlp.tools.tokenize.TokenSample;
 import opennlp.tools.util.eval.Evaluator;
 import opennlp.tools.util.eval.Mean;
 

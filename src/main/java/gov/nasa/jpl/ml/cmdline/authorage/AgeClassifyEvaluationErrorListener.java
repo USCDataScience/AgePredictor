@@ -19,9 +19,9 @@ package gov.nasa.jpl.ml.cmdline.authorage;
 
 import java.io.OutputStream;
 
-import opennlp.tools.cmdline.EvaluationErrorPrinter;
 import opennlp.tools.authorage.AgeClassifyEvaluationMonitor;
 import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.cmdline.EvaluationErrorPrinter;
 import opennlp.tools.util.eval.EvaluationMonitor;
 
 /**
