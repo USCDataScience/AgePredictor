@@ -26,9 +26,9 @@ import org.apache.spark.sql.SparkSession;
 
 import gov.nasa.jpl.ml.cmdline.CLI;
 import gov.nasa.jpl.ml.cmdline.params.PredictTrainingToolParams;
-import gov.nasa.jpl.ml.spark.AgeClassifyContextGeneratorWrapper;
-import gov.nasa.jpl.ml.spark.AgePredictModel;
-import gov.nasa.jpl.ml.spark.AgePredictSGDTrainer;
+import gov.nasa.jpl.ml.spark.authorage.AgeClassifyContextGeneratorWrapper;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictSGDTrainer;
 import opennlp.tools.cmdline.ArgumentParser;
 import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineUtil;

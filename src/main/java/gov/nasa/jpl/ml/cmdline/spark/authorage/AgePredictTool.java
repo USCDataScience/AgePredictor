@@ -40,7 +40,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
 import gov.nasa.jpl.ml.cmdline.CLI;
-import gov.nasa.jpl.ml.spark.AgePredictModel;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
 import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.cmdline.BasicCmdLineTool;

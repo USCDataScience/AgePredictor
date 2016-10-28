@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 import gov.nasa.jpl.ml.cmdline.CLI;
 import gov.nasa.jpl.ml.cmdline.params.SparkTrainingToolParams;
-import gov.nasa.jpl.ml.spark.AgeClassifySparkTrainer;
+import gov.nasa.jpl.ml.spark.authorage.AgeClassifySparkTrainer;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.cmdline.AbstractTrainerTool;

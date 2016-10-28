@@ -33,8 +33,6 @@ import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.PlainTextByLineStream;
 import opennlp.tools.util.TrainingParameters;
 
-//import opennlp.tools.ml.naivebayes.NaiveBayesTrainer;
-
 /**
  * TODO: Documentation
  */

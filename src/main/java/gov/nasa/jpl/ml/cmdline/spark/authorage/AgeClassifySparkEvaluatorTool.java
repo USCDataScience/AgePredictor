@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import gov.nasa.jpl.ml.cmdline.CLI;
 import gov.nasa.jpl.ml.cmdline.params.SparkEvalToolParams;
-import gov.nasa.jpl.ml.spark.AgeClassifySparkEvaluator;
+import gov.nasa.jpl.ml.spark.authorage.AgeClassifySparkEvaluator;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.cmdline.AbstractEvaluatorTool;
 import opennlp.tools.cmdline.ArgumentParser;

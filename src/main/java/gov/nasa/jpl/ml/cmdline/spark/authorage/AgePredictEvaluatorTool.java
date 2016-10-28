@@ -23,7 +23,7 @@ import org.apache.spark.sql.SparkSession;
 
 import gov.nasa.jpl.ml.cmdline.CLI;
 import gov.nasa.jpl.ml.cmdline.params.PredictEvalToolParams;
-import gov.nasa.jpl.ml.spark.AgePredictEvaluator;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictEvaluator;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.cmdline.AbstractEvaluatorTool;
 import opennlp.tools.cmdline.ArgumentParser;
