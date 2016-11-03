@@ -33,7 +33,7 @@ import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.ObjectStreamFactory;
 import opennlp.tools.cmdline.StreamFactoryRegistry;
 import opennlp.tools.cmdline.TerminateToolException;
-import opennlp.tools.ml.AgeClassifyTrainerFactory;
+import opennlp.tools.ml.authorage.AgeClassifyTrainerFactory;
 import opennlp.tools.util.TrainingParameters;
 import opennlp.tools.util.model.ModelUtil;
 

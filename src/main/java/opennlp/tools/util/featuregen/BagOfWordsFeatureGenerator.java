@@ -35,11 +35,11 @@ public class BagOfWordsFeatureGenerator implements FeatureGenerator {
     private static List<String> stopwords = new ArrayList<String>();
    
     static {
-	try {
-	    stopwords = FileUtils.readLines(new File("props/stopwords.txt"), "utf-8");
-	} catch (IOException e) {
-	    stopwords = new ArrayList<String>();
-	}
+		try {
+		    stopwords = FileUtils.readLines(new File("props/stopwords.txt"), "utf-8");
+		} catch (IOException e) {
+		    stopwords = new ArrayList<String>();
+		}
     }
     
     public BagOfWordsFeatureGenerator() {

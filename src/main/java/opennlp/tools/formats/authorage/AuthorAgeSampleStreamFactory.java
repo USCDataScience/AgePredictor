@@ -1,4 +1,4 @@
-package opennlp.tools.formats;
+package opennlp.tools.formats.authorage;
 
 import java.io.IOException;
 
@@ -11,6 +11,7 @@ import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.StreamFactoryRegistry;
 import opennlp.tools.cmdline.params.BasicFormatParams;
+import opennlp.tools.formats.AbstractSampleStreamFactory;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.InputStreamFactory;

@@ -25,9 +25,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import opennlp.tools.ml.AgeClassifyTrainerFactory;
-import opennlp.tools.ml.AgeClassifyTrainerFactory.TrainerType;
 import opennlp.tools.ml.EventTrainer;
+import opennlp.tools.ml.authorage.AgeClassifyTrainerFactory;
+import opennlp.tools.ml.authorage.AgeClassifyTrainerFactory.TrainerType;
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.tokenize.Tokenizer;

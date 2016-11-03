@@ -27,7 +27,9 @@ import java.util.List;
  * TODO: Documentation
  */
 public class AuthorAgeSample implements Serializable{
-    private final String ageCategory;
+	private static final long serialVersionUID = 5374409234122582256L;
+
+	private final String ageCategory;
     
     private final List<String> text;    
     

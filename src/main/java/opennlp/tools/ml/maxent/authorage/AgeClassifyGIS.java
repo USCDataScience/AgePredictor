@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-package opennlp.tools.ml.maxent;
+package opennlp.tools.ml.maxent.authorage;
 
 import java.io.IOException;
 
 import opennlp.tools.ml.AbstractEventTrainer;
+import opennlp.tools.ml.maxent.GISModel;
+import opennlp.tools.ml.maxent.GISTrainer;
 import opennlp.tools.ml.model.ChiSquaredDataIndexer;
 import opennlp.tools.ml.model.DataIndexer;
 import opennlp.tools.ml.model.Event;

@@ -36,7 +36,7 @@ import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineTool;
 import opennlp.tools.cmdline.TerminateToolException;
 import opennlp.tools.cmdline.TypedCmdLineTool;
-import opennlp.tools.formats.AuthorAgeSampleStreamFactory;
+import opennlp.tools.formats.authorage.AuthorAgeSampleStreamFactory;
 
 /**
  * TODO: Documentation

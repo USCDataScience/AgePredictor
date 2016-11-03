@@ -15,15 +15,20 @@
  * limitations under the License.
  */
 
-package opennlp.tools.ml;
+package opennlp.tools.ml.authorage;
 
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import opennlp.tools.ml.maxent.AgeClassifyGIS;
+import opennlp.tools.ml.AbstractEventTrainer;
+import opennlp.tools.ml.AbstractTrainer;
+import opennlp.tools.ml.EventModelSequenceTrainer;
+import opennlp.tools.ml.EventTrainer;
+import opennlp.tools.ml.SequenceTrainer;
 import opennlp.tools.ml.maxent.GIS;
+import opennlp.tools.ml.maxent.authorage.AgeClassifyGIS;
 import opennlp.tools.util.ext.ExtensionLoader;
 import opennlp.tools.util.ext.ExtensionNotLoadedException;
 
