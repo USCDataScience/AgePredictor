@@ -17,8 +17,6 @@
 
 package opennlp.tools.util.featuregen;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 
 import org.junit.Test;
