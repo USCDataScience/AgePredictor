@@ -1,0 +1,5 @@
+12	I am just 12 year old
+25	I am little bigger
+35	I am mature
+45	I am getting old
+60	I am old like wine
