@@ -55,6 +55,8 @@ bin/authorage AgeClassifyEvaluator -model model/en-ageClassify.bin -data data/te
 
 ### How to run the Age Classifier
 
+Note: Each document must be followed by an empty line to be detected as a separate case from the others.
+
 ```shell
 Usage: bin/authorage AgeClassify model < documents
 ```
