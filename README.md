@@ -31,7 +31,15 @@ Example Usage:
 ``` shell
 bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/train.txt -encoding UTF-8
 ```
-
+Training data format - Age and text seperated by tab in each line like `<AGE><Tab><TEXT>`    
+Sample training data-
+```
+12	I am just 12 year old
+25	I am little bigger
+35	I am mature
+45	I am getting old
+60	I am old like wine
+```
 ### How to evaluate an Age Classifier Model
 
 ```shell
