@@ -4,6 +4,8 @@ This is a author age categorizer that leverages the [Apache OpenNLP](https://ope
 # Usage
 ### How to train an Age Classifier
 
+Note: The training data should be a line-by-line, with each line starting with the age, or age category, followed by a tab and the text associated with the age. 
+
 ``` shell
 Usage: bin/authorage AgeClassifyTrainer [-factory factoryName] [-featureGenerators featuregens] [-tokenizer tokenizer] -model modelFile [-params paramsFile] -lang language -data sampleData [-encoding charsetName]
 
