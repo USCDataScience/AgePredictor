@@ -27,8 +27,8 @@ import opennlp.tools.ml.AbstractTrainer;
 import opennlp.tools.ml.EventModelSequenceTrainer;
 import opennlp.tools.ml.EventTrainer;
 import opennlp.tools.ml.SequenceTrainer;
+import opennlp.tools.ml.maxent.AgeClassifyGIS;
 import opennlp.tools.ml.maxent.GIS;
-import opennlp.tools.ml.maxent.authorage.AgeClassifyGIS;
 import opennlp.tools.util.ext.ExtensionLoader;
 import opennlp.tools.util.ext.ExtensionNotLoadedException;
 

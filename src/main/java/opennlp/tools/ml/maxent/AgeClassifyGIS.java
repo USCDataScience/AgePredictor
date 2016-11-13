@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package opennlp.tools.ml.maxent.authorage;
+package opennlp.tools.ml.maxent;
 
 import java.io.IOException;
 
