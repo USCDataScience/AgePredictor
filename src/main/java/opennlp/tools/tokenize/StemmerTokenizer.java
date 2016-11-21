@@ -3,9 +3,9 @@ package opennlp.tools.tokenize;
 import java.util.ArrayList;
 import java.util.List;
 
+import opennlp.tools.stemmer.PorterStemmer;
 import opennlp.tools.util.Span;
 import opennlp.tools.util.StringUtil;
-import opennlp.tools.stemmer.PorterStemmer;
 
 /**
  * TODO: Documentation

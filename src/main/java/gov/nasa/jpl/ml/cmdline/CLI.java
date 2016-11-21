@@ -24,20 +24,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyEvaluatorTool;
+import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTool;
+import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTrainerTool;
+import gov.nasa.jpl.ml.cmdline.spark.authorage.AgeClassifySparkEvaluatorTool;
+import gov.nasa.jpl.ml.cmdline.spark.authorage.AgeClassifySparkTrainerTool;
+import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictEvaluatorTool;
+import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictTool;
+import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictTrainerTool;
 import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineTool;
 import opennlp.tools.cmdline.TerminateToolException;
 import opennlp.tools.cmdline.TypedCmdLineTool;
-
-import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTrainerTool;
-import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyTool;
-import gov.nasa.jpl.ml.cmdline.authorage.AgeClassifyEvaluatorTool;
-import gov.nasa.jpl.ml.cmdline.spark.authorage.AgeClassifySparkTrainerTool;
-import gov.nasa.jpl.ml.cmdline.spark.authorage.AgeClassifySparkEvaluatorTool;
-import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictTrainerTool;
-import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictTool;
-import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictEvaluatorTool;
-import opennlp.tools.formats.AuthorAgeSampleStreamFactory;
+import opennlp.tools.formats.authorage.AuthorAgeSampleStreamFactory;
 
 /**
  * TODO: Documentation

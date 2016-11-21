@@ -17,9 +17,9 @@
 
 package gov.nasa.jpl.ml.cmdline.params;
 
+import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
 import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 import opennlp.tools.cmdline.params.TrainingToolParams;
-import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
 
 /**
  * TODO: Documentation

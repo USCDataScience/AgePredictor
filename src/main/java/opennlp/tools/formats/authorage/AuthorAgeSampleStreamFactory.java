@@ -1,27 +1,23 @@
-package opennlp.tools.formats;
+package opennlp.tools.formats.authorage;
 
 import java.io.IOException;
 
+import gov.nasa.jpl.ml.cmdline.CLI;
+import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.authorage.AuthorAgeSampleStream;
 import opennlp.tools.cmdline.ArgumentParser;
+import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
+import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
 import opennlp.tools.cmdline.CmdLineUtil;
 import opennlp.tools.cmdline.StreamFactoryRegistry;
 import opennlp.tools.cmdline.params.BasicFormatParams;
-import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
-import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
-
+import opennlp.tools.formats.AbstractSampleStreamFactory;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.PlainTextByLineStream;
-
-import opennlp.tools.tokenize.WhitespaceTokenizer;
-import opennlp.tools.tokenize.Tokenizer;
-
-import opennlp.tools.authorage.AuthorAgeSample;
-import opennlp.tools.authorage.AuthorAgeSampleStream;
-
 import opennlp.tools.util.ext.ExtensionLoader;
-
-import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation

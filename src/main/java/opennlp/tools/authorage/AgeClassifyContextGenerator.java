@@ -17,11 +17,8 @@
 
 package opennlp.tools.authorage;
 
-import java.util.Iterator;
-
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 import opennlp.tools.util.featuregen.FeatureGenerator;
 

@@ -19,15 +19,11 @@ package opennlp.tools.util.featuregen;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.List;
 
-import opennlp.tools.util.InvalidFormatException;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Generates a feature for each word in a document.
@@ -39,11 +35,11 @@ public class BagOfWordsFeatureGenerator implements FeatureGenerator {
     private static List<String> stopwords = new ArrayList<String>();
    
     static {
-	try {
-	    stopwords = FileUtils.readLines(new File("props/stopwords.txt"), "utf-8");
-	} catch (IOException e) {
-	    stopwords = new ArrayList<String>();
-	}
+		try {
+		    stopwords = FileUtils.readLines(new File("props/stopwords.txt"), "utf-8");
+		} catch (IOException e) {
+		    stopwords = new ArrayList<String>();
+		}
     }
     
     public BagOfWordsFeatureGenerator() {

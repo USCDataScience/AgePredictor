@@ -15,29 +15,28 @@
  * limitations under the License.
  */
 
-package gov.nasa.jpl.ml.spark.authorage;
+package opennlp.tools.util.featuregen;
 
-import java.io.Serializable;
-import java.io.IOException;
-import java.io.File;
+import java.util.Collection;
 
-import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.authorage.AgeClassifyME;
+import org.junit.Test;
+
+/**
+ * Test for the {@link POSFeatureGenerator}
+ */
+public class POSFeatureGeneratorTest {
     
-public class AgeClassifyModelWrapper implements Serializable {
-    private File model;
+    @Test
+    public void testFeatureGeneration() {
+	String text[] = 
+	    new String[] {"This", "is", "the", "first", "sentence", ".", "<SENTENCE>", 
+			  "This", ":", "is", "the", "second", "sentence", "<SENTENCE>"};
 	
-    public AgeClassifyModelWrapper(File modelIn) {
-	this.model = modelIn;
-    }
-    
-    public AgeClassifyModel getModel() throws IOException {
-	return new AgeClassifyModel(this.model);
-    }
-    
-    public AgeClassifyME getClassifier() throws IOException {
-	AgeClassifyModel model = new AgeClassifyModel(this.model);
-	return new AgeClassifyME(model);
+	
+	POSFeatureGenerator fg = POSFeatureGenerator.INSTANCE;
+	
+	Collection<String> features = fg.extractFeatures(text);
+	System.out.println(features.toString());
     }
 
 

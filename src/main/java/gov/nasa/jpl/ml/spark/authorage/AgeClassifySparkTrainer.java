@@ -19,31 +19,24 @@ package gov.nasa.jpl.ml.spark.authorage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
 
-import opennlp.tools.ml.EventTrainer;
-import opennlp.tools.ml.model.Event;
-import opennlp.tools.ml.model.MaxentModel;
-import opennlp.tools.util.TrainingParameters;
-import opennlp.tools.util.ObjectStream;
-
-import opennlp.tools.cmdline.CmdLineUtil;
-import opennlp.tools.cmdline.TerminateToolException;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 
 import opennlp.tools.authorage.AgeClassifyFactory;
 import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.ml.AgeClassifyTrainerFactory;
-
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.storage.StorageLevel;
+import opennlp.tools.cmdline.CmdLineUtil;
+import opennlp.tools.cmdline.TerminateToolException;
+import opennlp.tools.ml.EventTrainer;
+import opennlp.tools.ml.authorage.AgeClassifyTrainerFactory;
+import opennlp.tools.ml.model.Event;
+import opennlp.tools.ml.model.MaxentModel;
+import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.TrainingParameters;
 
 /**
  * TODO: Documentation

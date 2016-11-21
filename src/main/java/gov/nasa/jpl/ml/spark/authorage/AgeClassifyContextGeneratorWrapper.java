@@ -21,11 +21,9 @@ import java.io.Serializable;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
-
-import opennlp.tools.util.featuregen.FeatureGenerator;
-import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
-
 import opennlp.tools.util.ext.ExtensionLoader;
+import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
+import opennlp.tools.util.featuregen.FeatureGenerator;
 
 public class AgeClassifyContextGeneratorWrapper implements Serializable {
     private String tokenizer;

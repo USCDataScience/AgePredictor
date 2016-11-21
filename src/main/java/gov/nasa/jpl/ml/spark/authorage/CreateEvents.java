@@ -17,15 +17,12 @@
 
 package gov.nasa.jpl.ml.spark.authorage;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import opennlp.tools.authorage.AuthorAgeSample;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.util.featuregen.FeatureGenerator;
-
 import org.apache.spark.api.java.function.Function;
+
+import opennlp.tools.util.featuregen.FeatureGenerator;
 
 public class CreateEvents implements Function<String, EventWrapper> {
     private AgeClassifyContextGeneratorWrapper wrapper;

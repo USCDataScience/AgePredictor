@@ -20,10 +20,10 @@ package gov.nasa.jpl.ml.spark.authorage;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.spark.api.java.JavaRDD;
+
 import opennlp.tools.ml.model.Event;
 import opennlp.tools.util.ObjectStream;
-    
-import org.apache.spark.api.java.JavaRDD;
 
 public class EventStreamUtil {
     

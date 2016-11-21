@@ -17,21 +17,16 @@
 
 package opennlp.tools.tokenize;
 
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
-
 import opennlp.tools.util.Span;
 /**
  * TODO: Documentation

@@ -17,42 +17,36 @@
 
 package gov.nasa.jpl.ml.spark.authorage;
 
-import scala.Tuple2;
-
-import java.io.IOException;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Collection;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
-
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaDoubleRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.ml.linalg.SparseVector;
-import org.apache.spark.mllib.linalg.Vectors;
-import org.apache.spark.mllib.linalg.Vector;
-import org.apache.spark.sql.Dataset;
-
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.types.*;
-import org.apache.spark.sql.SparkSession;
-import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.ml.feature.CountVectorizerModel;
 import org.apache.spark.ml.feature.Normalizer;
+import org.apache.spark.ml.linalg.SparseVector;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.linalg.Vectors;
+import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.mllib.regression.LassoModel;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.ArrayType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 
-import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.util.featuregen.FeatureGenerator;
-
-import gov.nasa.jpl.ml.spark.authorage.EventWrapper;
-import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import scala.Tuple2;
 
 /**
  * TODO: Documentation

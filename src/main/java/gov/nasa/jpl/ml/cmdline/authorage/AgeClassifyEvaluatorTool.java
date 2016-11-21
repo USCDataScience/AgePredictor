@@ -24,28 +24,23 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
- 
-import opennlp.tools.cmdline.AbstractEvaluatorTool;
-import opennlp.tools.cmdline.ArgumentParser.OptionalParameter;
-import opennlp.tools.cmdline.ArgumentParser.ParameterDescription;
-import opennlp.tools.cmdline.CmdLineUtil;
-import opennlp.tools.cmdline.PerformanceMonitor;
-import opennlp.tools.cmdline.TerminateToolException;
-import opennlp.tools.cmdline.ArgumentParser;
-import opennlp.tools.cmdline.ObjectStreamFactory;
-import opennlp.tools.cmdline.StreamFactoryRegistry;
-import opennlp.tools.cmdline.doccat.DoccatFineGrainedReportListener;
 
+import gov.nasa.jpl.ml.cmdline.CLI;
+import gov.nasa.jpl.ml.cmdline.params.EvalToolParams;
 import opennlp.tools.authorage.AgeClassifyEvaluationMonitor;
-import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AgeClassifyEvaluator;
 import opennlp.tools.authorage.AgeClassifyME;
+import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.authorage.AuthorAgeSample;
+import opennlp.tools.cmdline.AbstractEvaluatorTool;
+import opennlp.tools.cmdline.ArgumentParser;
+import opennlp.tools.cmdline.CmdLineUtil;
+import opennlp.tools.cmdline.ObjectStreamFactory;
+import opennlp.tools.cmdline.PerformanceMonitor;
+import opennlp.tools.cmdline.StreamFactoryRegistry;
+import opennlp.tools.cmdline.TerminateToolException;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.eval.EvaluationMonitor;
-
-import gov.nasa.jpl.ml.cmdline.params.EvalToolParams;
-import gov.nasa.jpl.ml.cmdline.CLI;
 
 /**
  * TODO: Documentation

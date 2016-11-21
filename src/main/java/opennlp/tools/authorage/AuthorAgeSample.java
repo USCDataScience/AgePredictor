@@ -18,7 +18,6 @@
 package opennlp.tools.authorage;
 
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +27,9 @@ import java.util.List;
  * TODO: Documentation
  */
 public class AuthorAgeSample implements Serializable{
-    private final String ageCategory;
+	private static final long serialVersionUID = 5374409234122582256L;
+
+	private final String ageCategory;
     
     private final List<String> text;    
     

@@ -18,36 +18,27 @@
 package gov.nasa.jpl.ml.cmdline.spark.authorage;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
-import opennlp.tools.cmdline.BasicCmdLineTool;
-import opennlp.tools.cmdline.CmdLineUtil;
-import opennlp.tools.cmdline.TerminateToolException;
-import opennlp.tools.cmdline.ArgumentParser;
-
-import opennlp.tools.util.ext.ExtensionLoader;
-import opennlp.tools.util.model.ModelUtil;
-import opennlp.tools.util.InvalidFormatException;
-
-import opennlp.tools.authorage.AuthorAgeSample;
-import opennlp.tools.authorage.AgeClassifyModel;
-import opennlp.tools.ml.AgeClassifyTrainerFactory;
-import opennlp.tools.util.TrainingParameters;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.WhitespaceTokenizer;
-import opennlp.tools.util.featuregen.FeatureGenerator;
-import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
 
 import org.apache.spark.sql.SparkSession;
 
-import gov.nasa.jpl.ml.cmdline.params.PredictTrainingToolParams;
 import gov.nasa.jpl.ml.cmdline.CLI;
-
-import gov.nasa.jpl.ml.spark.authorage.AgePredictSGDTrainer;
-import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import gov.nasa.jpl.ml.cmdline.params.PredictTrainingToolParams;
 import gov.nasa.jpl.ml.spark.authorage.AgeClassifyContextGeneratorWrapper;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import gov.nasa.jpl.ml.spark.authorage.AgePredictSGDTrainer;
+import opennlp.tools.cmdline.ArgumentParser;
+import opennlp.tools.cmdline.BasicCmdLineTool;
+import opennlp.tools.cmdline.CmdLineUtil;
+import opennlp.tools.cmdline.TerminateToolException;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
+import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.ext.ExtensionLoader;
+import opennlp.tools.util.featuregen.BagOfWordsFeatureGenerator;
+import opennlp.tools.util.featuregen.FeatureGenerator;
 
 /**
  * TODO: Documentation

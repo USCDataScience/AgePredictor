@@ -17,19 +17,15 @@
 
 package opennlp.tools.util.featuregen;
 
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.List;
 
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
-
-import opennlp.tools.util.InvalidFormatException;
 
 /**
  * Generates a feature for the POS of each word in a document.

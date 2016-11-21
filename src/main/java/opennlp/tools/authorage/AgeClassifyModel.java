@@ -21,9 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Properties;
 
-import opennlp.tools.ml.model.AbstractModel;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.model.BaseModel;

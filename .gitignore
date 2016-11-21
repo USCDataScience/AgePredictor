@@ -28,3 +28,10 @@ model/opennlp/*bin
 
 # Log files
 *out
+.pydevproject
+
+.classpath
+
+.project
+
+.settings/
