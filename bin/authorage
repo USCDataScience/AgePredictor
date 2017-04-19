@@ -17,7 +17,7 @@
 #   specific language governing permissions and limitations
 #   under the License.
 
-export SPARK_HOME="spark-2.0.0-bin-hadoop2.7"
+# export SPARK_HOME="spark-2.0.0-bin-hadoop2.7"
 
 # Created JAR Application
 export JAR="target/age-predictor-1.0-SNAPSHOT-jar-with-dependencies.jar"
