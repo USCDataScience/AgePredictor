@@ -69,6 +69,13 @@ Note: Each document must be followed by an empty line to be detected as a separa
 Usage: bin/authorage AgeClassify model < documents
 ```
 
+```shell
+Usage: bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt
+```
+
+# Downloads
+For AgePredict to work you need to download `en-pos-maxent.bin`, `en-sent.bin` and `en-token.bin` from [http://opennlp.sourceforge.net/models-1.5/](http://opennlp.sourceforge.net/models-1.5/) to `model/opennlp/`
+
 # Contributors
 * Joey Hong, Caltech, CA
 
