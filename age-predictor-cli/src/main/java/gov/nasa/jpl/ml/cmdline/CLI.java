@@ -32,6 +32,7 @@ import gov.nasa.jpl.ml.cmdline.spark.authorage.AgeClassifySparkTrainerTool;
 import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictEvaluatorTool;
 import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictTool;
 import gov.nasa.jpl.ml.cmdline.spark.authorage.AgePredictTrainerTool;
+import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.cmdline.BasicCmdLineTool;
 import opennlp.tools.cmdline.CmdLineTool;
 import opennlp.tools.cmdline.TerminateToolException;
@@ -43,7 +44,7 @@ import opennlp.tools.formats.authorage.AuthorAgeSampleStreamFactory;
  */
 public class CLI {
     public static final String CMD = "bin/authorage";
-    public static final String DEFAULT_FORMAT = "authorage";
+    public static final String DEFAULT_FORMAT = AuthorAgeSample.FORMAT_NAME;
     
     private static Map<String, CmdLineTool> toolLookupMap;
     

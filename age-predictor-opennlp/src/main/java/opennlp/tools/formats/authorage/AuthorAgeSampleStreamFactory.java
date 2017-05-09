@@ -2,7 +2,6 @@ package opennlp.tools.formats.authorage;
 
 import java.io.IOException;
 
-import gov.nasa.jpl.ml.cmdline.CLI;
 import opennlp.tools.authorage.AuthorAgeSample;
 import opennlp.tools.authorage.AuthorAgeSampleStream;
 import opennlp.tools.cmdline.ArgumentParser;
@@ -66,7 +65,7 @@ public class AuthorAgeSampleStreamFactory
 
     public static void registerFactory() {
 	StreamFactoryRegistry.registerFactory(AuthorAgeSample.class,
-	    CLI.DEFAULT_FORMAT,
+			AuthorAgeSample.FORMAT_NAME,
 	    new AuthorAgeSampleStreamFactory(AuthorAgeStreamFactoryParams.class));
     }   
 }

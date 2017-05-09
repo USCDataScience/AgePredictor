@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package gov.nasa.jpl.ml.cmdline.spark.authorage;
+package edu.usc.irds.agepredictor.authorage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,30 +43,30 @@ import org.apache.spark.sql.types.StructType;
 import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
 import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AgeClassifyModel;
+import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.featuregen.FeatureGenerator;
 
 /**
- * TODO: Documentation
+ * Uses already trained MLLib LassoModel in Spark Local mode. </br>
+ * Provides java method which can be conveniently used by other libraries
  */
 public class AgePredicterLocal {
 
-	public static void main(String[] args) throws Exception {
+	public double predictAge(String document) throws InvalidFormatException, IOException {
+
 		SparkSession spark = SparkSession.builder().master("local").appName("AgePredict").getOrCreate();
-		
+
 		AgeClassifyModel classifyModel = new AgeClassifyModel(new File("./model/classify-bigram.bin"));
 
 		AgeClassifyME classify = new AgeClassifyME(classifyModel);
 		AgePredictModel model = AgePredictModel.readModel(new File("./model/regression-global.bin"));
-		
+
 		FeatureGenerator[] featureGenerators = model.getContext().getFeatureGenerators();
-		
+
 		List<Row> data = new ArrayList<Row>();
-		
-		String document = "I am very very old person";
-		
+
 		String[] tokens = model.getContext().getTokenizer().tokenize(document);
 
-		
 		double prob[] = classify.getProbabilities(tokens);
 		String category = classify.getBestCategory(prob);
 
@@ -81,17 +82,17 @@ public class AgePredicterLocal {
 				context.add("cat=" + category);
 			}
 		}
-		
+
 		if (context.size() > 0) {
 			data.add(RowFactory.create(document, context.toArray()));
 		}
-		
+
 		StructType schema = new StructType(
 				new StructField[] { new StructField("document", DataTypes.StringType, false, Metadata.empty()),
 						new StructField("text", new ArrayType(DataTypes.StringType, true), false, Metadata.empty()) });
 
 		Dataset<Row> df = spark.createDataFrame(data, schema);
-		
+
 		CountVectorizerModel cvm = new CountVectorizerModel(model.getVocabulary()).setInputCol("text")
 				.setOutputCol("feature");
 
@@ -100,15 +101,32 @@ public class AgePredicterLocal {
 		Normalizer normalizer = new Normalizer().setInputCol("feature").setOutputCol("normFeature").setP(1.0);
 
 		JavaRDD<Row> normEventDF = normalizer.transform(eventDF).javaRDD();
-		
+
 		Row event = normEventDF.first();
-		
+
 		SparseVector sp = (SparseVector) event.getAs("normFeature");
-		
+
 		final LassoModel linModel = model.getModel();
-		
+
 		Vector testData = Vectors.sparse(sp.size(), sp.indices(), sp.values());
-		System.out.println(linModel.predict(testData.compressed()));
+		return linModel.predict(testData.compressed());
+
+	}
+
+	public static void main(String[] args) throws Exception {
+
+		String inputText = "I am very very old person";
+		if (args.length > 0) {
+			StringBuilder builder = new StringBuilder();
+			for (String s : args) {
+				builder.append(s);
+			}
+			inputText = builder.toString();
+		}
+		double age = new AgePredicterLocal().predictAge(inputText);
 		
+		System.out.println("\n===================\n");
+		System.out.println(String.format("Text received- '%s' \n Predicted Age - %f%n",inputText, age));
+		System.out.println("\n===================\n");
 	}
 }
