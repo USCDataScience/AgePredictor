@@ -120,6 +120,7 @@ public class AgePredicterLocal {
 			StringBuilder builder = new StringBuilder();
 			for (String s : args) {
 				builder.append(s);
+				builder.append(" ");
 			}
 			inputText = builder.toString();
 		}
