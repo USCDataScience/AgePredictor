@@ -8,6 +8,10 @@
 	</parent>
 	<artifactId>age-predictor-assembly</artifactId>
 	
+	<properties>
+     <model.opennlp>../model/opennlp/</model.opennlp>
+  	</properties>
+  
 	<dependencies>
 		<dependency>
 			<groupId>edu.usc.irds</groupId>
@@ -96,6 +100,46 @@
 						<version>1.0</version>
 					</signature>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.3.0</version>
+				<executions>
+					<execution>
+						<id>download-en-pos-maxent</id>
+						<phase>install</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>http://opennlp.sourceforge.net/models-1.5/en-pos-maxent.bin</url>
+							<outputDirectory>${model.opennlp}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-en-sent</id>
+						<phase>install</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>http://opennlp.sourceforge.net/models-1.5/en-sent.bin</url>
+							<outputDirectory>${model.opennlp}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-en-token</id>
+						<phase>install</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>http://opennlp.sourceforge.net/models-1.5/en-token.bin</url>
+							<outputDirectory>${model.opennlp}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
