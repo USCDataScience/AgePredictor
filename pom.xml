@@ -2,12 +2,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
-  <groupId>gov.nasa.jpl.ml</groupId>
+  <groupId>edu.usc.irds</groupId>
   <artifactId>age-predictor</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   
-  <name>age-classify</name>
+  <name>age-predictor</name>
   <url>http://maven.apache.org</url>
 
   <licenses>
@@ -87,8 +87,8 @@
   </build>
 
   <modules>
-  	<module>age-predictor-cli</module>
   	<module>age-predictor-opennlp</module>
+  	<module>age-predictor-cli</module>
   	<module>age-predictor-api</module>
   	<module>age-predictor-assembly</module>
   </modules>

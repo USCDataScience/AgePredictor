@@ -40,7 +40,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
-import gov.nasa.jpl.ml.spark.authorage.AgePredictModel;
+import edu.usc.irds.agepredictor.spark.authorage.AgePredictModel;
 import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AgeClassifyModel;
 import opennlp.tools.util.InvalidFormatException;
