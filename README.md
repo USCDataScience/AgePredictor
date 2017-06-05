@@ -77,7 +77,9 @@ Usage: bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-
 For AgePredict to work you need to download `en-pos-maxent.bin`, `en-sent.bin` and `en-token.bin` from [http://opennlp.sourceforge.net/models-1.5/](http://opennlp.sourceforge.net/models-1.5/) to `model/opennlp/`
 
 # Contributors
-* Joey Hong, Caltech, CA
+* Chris A. Mattmann, JPL & USC
+* Joey Hong, Caltech
+* Madhav Sharan, JPL & USC
 
 # License 
 [Apache License, version 2](http://www.apache.org/licenses/LICENSE-2.0)
