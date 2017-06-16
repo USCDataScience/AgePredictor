@@ -39,17 +39,19 @@ public class LIWCFeatureGenerator implements FeatureGenerator {
     
     static {
 	File[] files = new File("props/wordlists/").listFiles();
-
-	for (File file: files) {
-	    String filename = file.getName();
-	    filename = filename.substring(0, filename.lastIndexOf('.'));
-	    
-	    try {
-		List<String> list = FileUtils.readLines(file, "utf-8");
-		liwc.put(filename, list);
-	    } catch (IOException e) {
-		//Just ignore?
-	    }
+	
+	if (files != null){
+		for (File file: files) {
+		    String filename = file.getName();
+		    filename = filename.substring(0, filename.lastIndexOf('.'));
+		    
+		    try {
+			List<String> list = FileUtils.readLines(file, "utf-8");
+			liwc.put(filename, list);
+		    } catch (IOException e) {
+			//Just ignore?
+		    }
+		}
 	}
     }
 	

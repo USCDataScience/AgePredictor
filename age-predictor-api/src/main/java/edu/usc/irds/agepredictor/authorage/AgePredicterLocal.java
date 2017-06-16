@@ -51,16 +51,25 @@ import opennlp.tools.util.featuregen.FeatureGenerator;
  * Provides java method which can be conveniently used by other libraries
  */
 public class AgePredicterLocal {
+	
+	private SparkSession spark;
+	private AgeClassifyModel classifyModel;
+	private AgeClassifyME classify;
+	private AgePredictModel model;
+	
+	public AgePredicterLocal() throws InvalidFormatException, IOException {
+		this("./model/classify-bigram.bin", "./model/regression-global.bin");
+	}
+	
+	public AgePredicterLocal(String pathToClassifyModel, String pathToRegressionModel) throws InvalidFormatException, IOException{
+		spark = SparkSession.builder().master("local").appName("AgePredict").getOrCreate();
+		classifyModel = new AgeClassifyModel(new File(pathToClassifyModel));
 
+		classify = new AgeClassifyME(classifyModel);
+		model = AgePredictModel.readModel(new File(pathToRegressionModel));
+	}
+	
 	public double predictAge(String document) throws InvalidFormatException, IOException {
-
-		SparkSession spark = SparkSession.builder().master("local").appName("AgePredict").getOrCreate();
-
-		AgeClassifyModel classifyModel = new AgeClassifyModel(new File("./model/classify-bigram.bin"));
-
-		AgeClassifyME classify = new AgeClassifyME(classifyModel);
-		AgePredictModel model = AgePredictModel.readModel(new File("./model/regression-global.bin"));
-
 		FeatureGenerator[] featureGenerators = model.getContext().getFeatureGenerators();
 
 		List<Row> data = new ArrayList<Row>();
