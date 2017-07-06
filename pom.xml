@@ -183,10 +183,18 @@
        <plugin>
          <artifactId>maven-release-plugin</artifactId>
          <version>2.5</version>
-         <configuration>
-           <releaseProfiles>release</releaseProfiles>
-           <goals>install animal-sniffer:check deploy site</goals>
-         </configuration>
+	 <dependencies>
+	   <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-api</artifactId>
+            <version>1.9.1</version>
+           </dependency>
+           <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>1.9.1</version>
+           </dependency>
+	 </dependencies>
        </plugin>
      </plugins>
       </build>
