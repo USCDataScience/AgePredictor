@@ -18,9 +18,8 @@
 
   <scm>
     <url>https://github.com/USCDataScience/AgePredictor.git</url>
-    <connection>scm:git:git://github.com/USCDataScience/AgePredictor.git</connection>
-    <developerConnection>scm:git:git@github.com:USCDataScience/AgePredictor.git</developerConnection>
-    <tag>1.0</tag>
+    <connection>scm:git:git@github.com:USCDataScience/AgePredictor.git</connection>
+    <tag>age-predictor-1.0</tag>
   </scm>
 
   <developers>
