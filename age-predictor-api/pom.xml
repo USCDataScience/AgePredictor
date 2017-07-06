@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>edu.usc.ir</groupId>
 		<artifactId>age-predictor</artifactId>
-		<version>1.0</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>age-predictor-api</artifactId>
 	
