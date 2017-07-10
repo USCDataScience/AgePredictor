@@ -84,7 +84,7 @@ If you use this work, please cite:
 @article{hong2017ensemble,
   title={Ensemble Maximum Entropy Classification and Linear Regression for Author Age Prediction},
   author={Hong, Joey and Mattmann, Chris and Ramirez, Paul},
-  booktitle={Information Reuse and Integration (IRI), 2016 IEEE 17th International Conference on},
+  booktitle={Information Reuse and Integration (IRI), 2017 IEEE 18th International Conference on},
   organization={IEEE}
   year={2017}
 }
