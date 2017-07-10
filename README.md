@@ -76,6 +76,20 @@ Usage: bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-
 # Downloads
 For AgePredict to work you need to download `en-pos-maxent.bin`, `en-sent.bin` and `en-token.bin` from [http://opennlp.sourceforge.net/models-1.5/](http://opennlp.sourceforge.net/models-1.5/) to `model/opennlp/`
 
+# Citation:
+
+If you use this work, please cite:
+
+```
+@article{hong2017ensemble,
+  title={Ensemble Maximum Entropy Classification and Linear Regression for Author Age Prediction},
+  author={Hong, Joey and Mattmann, Chris and Ramirez, Paul},
+  booktitle={Information Reuse and Integration (IRI), 2016 IEEE 17th International Conference on},
+  organization={IEEE}
+  year={2017}
+}
+```
+
 # Contributors
 * Chris A. Mattmann, JPL & USC
 * Joey Hong, Caltech
