@@ -35,10 +35,15 @@ public class SentenceTokenizer implements Tokenizer {
 
     public static final SentenceTokenizer INSTANCE = new SentenceTokenizer();
     
-    private final String TOKEN_MODEL_FILE = "model/opennlp/en-token.bin";
-    private final String SENTENCE_MODEL_FILE = "model/opennlp/en-sent.bin";
+    private String tokenModelFile = "model/opennlp/en-token.bin";
+    private String sentenceModelFile = "model/opennlp/en-sent.bin";
     
-    private SentenceTokenizer() {
+    private SentenceTokenizer() {	
+    }
+    
+    public SentenceTokenizer(String sentenceModelFile, String tokenModelFile) {
+    	this.sentenceModelFile = sentenceModelFile;
+    	this.tokenModelFile = tokenModelFile;
     }
     
     public String[] tokenize(String s) {
@@ -46,7 +51,7 @@ public class SentenceTokenizer implements Tokenizer {
 	
 	List<String> tokens = new ArrayList<String>();
 	try {
-	    modelIn = new FileInputStream(SENTENCE_MODEL_FILE);
+	    modelIn = new FileInputStream(sentenceModelFile);
 	    SentenceModel model = new SentenceModel(modelIn);
 	    
 	    SentenceDetector sentenceDetector = new SentenceDetectorME(model);
@@ -82,7 +87,7 @@ public class SentenceTokenizer implements Tokenizer {
 	String[] tokens = new String[0];
 	
 	try {
-	    modelIn = new FileInputStream(TOKEN_MODEL_FILE);
+	    modelIn = new FileInputStream(tokenModelFile);
 	    TokenizerModel model= new TokenizerModel(modelIn);
 	    
 	    Tokenizer tokenizer = new TokenizerME(model);

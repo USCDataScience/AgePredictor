@@ -43,6 +43,8 @@ import org.apache.spark.sql.types.StructType;
 import edu.usc.irds.agepredictor.spark.authorage.AgePredictModel;
 import opennlp.tools.authorage.AgeClassifyME;
 import opennlp.tools.authorage.AgeClassifyModel;
+import opennlp.tools.tokenize.SentenceTokenizer;
+import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.featuregen.FeatureGenerator;
 
@@ -56,17 +58,20 @@ public class AgePredicterLocal {
 	private AgeClassifyModel classifyModel;
 	private AgeClassifyME classify;
 	private AgePredictModel model;
+	private Tokenizer tokenizer;
 	
 	public AgePredicterLocal() throws InvalidFormatException, IOException {
-		this("./model/classify-bigram.bin", "./model/regression-global.bin");
+		this("./model/classify-bigram.bin", "./model/regression-global.bin", "./model/opennlp/en-sent.bin", "./model/opennlp/en-token.bin");
 	}
 	
-	public AgePredicterLocal(String pathToClassifyModel, String pathToRegressionModel) throws InvalidFormatException, IOException{
+	public AgePredicterLocal(String pathToClassifyModel, String pathToRegressionModel, String pathToSentenceModel, String pathToTokenModel) throws InvalidFormatException, IOException{
 		spark = SparkSession.builder().master("local").appName("AgePredict").getOrCreate();
 		classifyModel = new AgeClassifyModel(new File(pathToClassifyModel));
 
 		classify = new AgeClassifyME(classifyModel);
 		model = AgePredictModel.readModel(new File(pathToRegressionModel));
+		
+		this.tokenizer = new SentenceTokenizer(pathToSentenceModel, pathToTokenModel);
 	}
 	
 	public double predictAge(String document) throws InvalidFormatException, IOException {
@@ -74,7 +79,7 @@ public class AgePredicterLocal {
 
 		List<Row> data = new ArrayList<Row>();
 
-		String[] tokens = model.getContext().getTokenizer().tokenize(document);
+		String[] tokens = tokenizer.tokenize(document);
 
 		double prob[] = classify.getProbabilities(tokens);
 		String category = classify.getBestCategory(prob);
