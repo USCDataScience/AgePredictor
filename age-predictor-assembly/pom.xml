@@ -50,7 +50,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>gov.nasa.jpl.ml.cmdline.CLI</mainClass>
+							<mainClass>edu.usc.irds.agepredictor.cmdline.CLI</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
