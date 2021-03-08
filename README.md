@@ -1,6 +1,22 @@
 # Author Age Prediction
 This is a author age categorizer that leverages the [Apache OpenNLP](https://opennlp.apache.org/) Maximum Entropy Classifier. It takes a text sample and classifies it into the following age categories: xx-18|18-24|25-34|35-49|50-64|65-xx. 
 
+
+# Pre-Requisites
+
+  1. Download [Apache Spark 2.0.0](https://archive.apache.org/dist/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.7.tgz) and place in the local directory for this checkout.
+  2. `export SPARK_HOME="spark-2.0.0-bin-hadoop2.7"`
+
+
+
+# QuickStart
+
+  1. Follow the instructions to perform training, and build yourself a `model/en-ageClassify.bin` file
+    1a. `bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/train.txt -encoding UTF-8`
+  2. Run the Age prediction with the sample data
+    2a. `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt`
+    
+
 # Usage
 ### How to train an Age Classifier
 
@@ -58,7 +74,7 @@ Arguments description:
 
 Example Usage:
 ```shell
-bin/authorage AgeClassifyEvaluator -model model/en-ageClassify.bin -data data/test.txt -encoding UTF-8
+bin/authorage AgeClassifyEvaluator -model model/en-ageClassify.bin -data data/sample_test.txt -encoding UTF-8
 ```
 
 ### How to run the Age Classifier
@@ -70,7 +86,7 @@ Usage: bin/authorage AgeClassify model < documents
 ```
 
 ```shell
-Usage: bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt
+Usage: bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt
 ```
 
 # Downloads
