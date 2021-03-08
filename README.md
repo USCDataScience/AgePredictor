@@ -12,9 +12,9 @@ This is a author age categorizer that leverages the [Apache OpenNLP](https://ope
 # QuickStart
 
   1. Follow the instructions to perform training, and build yourself a `model/en-ageClassify.bin` file
-    1a. `bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/train.txt -encoding UTF-8`
+     *  `bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/train.txt -encoding UTF-8`
   2. Run the Age prediction with the sample data
-    2a. `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt`
+     * `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt`
     
 
 # Usage
