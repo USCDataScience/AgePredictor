@@ -7,8 +7,19 @@ This is a author age categorizer that leverages the [Apache OpenNLP](https://ope
   1. Download [Apache Spark 2.0.0](https://archive.apache.org/dist/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.7.tgz) and place in the local directory for this checkout.
   2. `export SPARK_HOME="spark-2.0.0-bin-hadoop2.7"`
   3. Run `bin/download-opennlp.sh` to download Apache OpenNLP models referenced below.
+  4. Run `mvn clean install` to build the assembly jars. The key one you need is `age-predictor-assembly/target/age-predictor-assembly-1.1-SNAPSHOT-jar-with-dependencies.jar`. If you do not see this jar, investigate your Maven and Java issues. It should build fine with
 
-
+```
+openjdk version "13.0.2" 2020-01-14
+OpenJDK Runtime Environment (build 13.0.2+8)
+OpenJDK 64-Bit Server VM (build 13.0.2+8, mixed mode, sharing)
+MT-202397:AgePredictor mattmann$ mvn --V
+Apache Maven 3.6.1 (d66c9c0b3152b2e69ee9bac180bb8fcc8e6af555; 2019-04-04T12:00:29-07:00)
+Maven home: /usr/local/Cellar/maven/3.6.1/libexec
+Java version: 13.0.2, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/openjdk-13.0.2.jdk/Contents/Home
+Default locale: en_US, platform encoding: UTF-8
+OS name: "mac os x", version: "10.15.7", arch: "x86_64", family: "mac"     
+```
 
 # QuickStart
 
