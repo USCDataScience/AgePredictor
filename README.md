@@ -29,6 +29,14 @@ OS name: "mac os x", version: "10.15.7", arch: "x86_64", family: "mac"
      * `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt`
   3. Run the Age prediction and grep out the predictions from the sample data
      * `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt 2>&1 | grep "Prediction"`
+     * If you see as output from the above command you're good!
+
+```
+Prediction: 33.25378998833527
+Prediction: 31.67628280063772
+```
+
+
     
 
 # Usage
