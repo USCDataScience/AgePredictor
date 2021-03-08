@@ -10,28 +10,27 @@
 
 # Virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
 *.DS_Store
-
 target/
 
 # Data Files
 data/*/*txt
 data/*/*/
-
 *~
 
 # OpenNLP Downloaded Models
 model/opennlp/*bin
-
 *pyc
 
 # Log files
 *out
 .pydevproject
-
 .classpath
-
 .project
-
 .settings/
+
+# Generated models
+model/en-ageClassify.bin
+
+# Spark
+spark-2.0.0-bin-hadoop2.7*
