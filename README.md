@@ -6,6 +6,7 @@ This is a author age categorizer that leverages the [Apache OpenNLP](https://ope
 
   1. Download [Apache Spark 2.0.0](https://archive.apache.org/dist/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.7.tgz) and place in the local directory for this checkout.
   2. `export SPARK_HOME="spark-2.0.0-bin-hadoop2.7"`
+  3. Run `bin/download-opennlp.sh` to download Apache OpenNLP models referenced below.
 
 
 
