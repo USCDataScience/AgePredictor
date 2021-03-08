@@ -16,6 +16,8 @@ This is a author age categorizer that leverages the [Apache OpenNLP](https://ope
      *  `bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/sample_train.txt -encoding UTF-8`
   2. Run the Age prediction with the sample data
      * `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt`
+  3. Run the Age prediction and grep out the predictions from the sample data
+     * `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt 2>&1 | grep "Prediction"`
     
 
 # Usage
