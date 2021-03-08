@@ -12,7 +12,7 @@ This is a author age categorizer that leverages the [Apache OpenNLP](https://ope
 # QuickStart
 
   1. Follow the instructions to perform training, and build yourself a `model/en-ageClassify.bin` file
-     *  `bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/train.txt -encoding UTF-8`
+     *  `bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/sample_train.txt -encoding UTF-8`
   2. Run the Age prediction with the sample data
      * `bin/authorage AgePredict ./model/classify-unigram.bin ./model/regression-global.bin  data/sample_test.txt < data/sample_test.txt`
     
@@ -45,7 +45,7 @@ Arguments description:
 ```
 Example Usage:
 ``` shell
-bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/train.txt -encoding UTF-8
+bin/authorage AgeClassifyTrainer -model model/en-ageClassify.bin -lang en -data data/sample_train.txt -encoding UTF-8
 ```
 Training data format - Age and text seperated by tab in each line like `<AGE><Tab><TEXT>`    
 Sample training data-
